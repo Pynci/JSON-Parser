@@ -1,4 +1,3 @@
 # JSON-Parser
 Antoniotti lore
-
-![alt text](https://www.icaih.com/wp-content/uploads/2019/09/Marco-Antoniotti.jpeg)
+![Logo](https://user-images.githubusercontent.com/74925736/202917987-5e227a86-d251-4fd4-8f2e-b759f94ef592.png)
