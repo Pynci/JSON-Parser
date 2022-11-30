@@ -6,7 +6,7 @@ parser_string([Virgolette | AltriCaratteri], Stringa, Resto) :-
     is_virgolette(Virgolette),
     leggi_stringa(AltriCaratteri, Letta, Resto),
     append([Virgolette], Letta, ListaStringa),
-    atomics_to_string(ListaStringa, Stringa).
+    atomic_list_concat(ListaStringa, Stringa).
 
 leggi_stringa([Virgolette | Resto], [Virgolette], Resto) :-
     is_virgolette(Virgolette),
