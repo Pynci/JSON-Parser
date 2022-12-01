@@ -31,6 +31,7 @@ leggi_stringa([Carattere | Altro], [Carattere | LettiPrecedentemente], Resto) :-
     char_type(Carattere, ascii),
     leggi_stringa(Altro, LettiPrecedentemente, Resto).
 
+
 %%% parser del numero intero (anche negativo)
 
 parser_z(Caratteri,
@@ -100,6 +101,7 @@ parse_integer([], DsR, I, Digits, []) :-
     reverse(DsR, Digits),
     number_string(I, Digits).
 
+
 %%% Parser da lista caratteri a q
 
 parser_q(Sequenza,
@@ -128,7 +130,71 @@ parser_decimale([Carattere | Altro], ['.' , '0'], [Carattere | Altro]).
 
 parser_decimale([], ['.' , '0'], []).
 
+
+/* 
+Da qui in poi ho cercato di creare i parser per i valori predefiniti
+true, false, null. Fammi sapere se è una merda poi cancella questo commento.
+*/
+
+%%% parser che riconosce il valore "true"
+is_t('t').
+is_r('r').
+is_u('u').
+is_e('e').
+
+parser_true([Carattere1, Carattere2, Carattere3, Carattere4 | _AltriCaratteri],
+            True, _Resto) :-
+    is_t(Carattere1),
+    is_r(Carattere2),
+    is_u(Carattere3),
+    is_e(Carattere4),
+    atomic_list_concat([Carattere1, Carattere2, Carattere3, Carattere4], True).
+
+
+%%% parser che riconosce il valore "false"
+is_f('f').
+is_a('a').
+is_l('l').
+is_s('s').
+% is_e/1 è già sopra
+
+parser_false([Carattere1, Carattere2, Carattere3, Carattere4, Carattere5
+            | _AltriCaratteri], False, _Resto) :-
+    is_f(Carattere1),
+    is_a(Carattere2),
+    is_l(Carattere3),
+    is_s(Carattere4),
+    is_e(Carattere5),
+    atomic_list_concat([Carattere1, Carattere2, Carattere3, 
+                        Carattere4, Carattere5], False).
+
+
+%%% parser che riconosce il valore "null"
+is_n('n').
+% is_u/1 è già sopra
+% is_l/1 è già sopra
+% is_l/1 è già sopra
+
+parser_null([Carattere1, Carattere2, Carattere3, Carattere4 | _AltriCaratteri],
+            Null, _Resto) :-
+    is_n(Carattere1),
+    is_u(Carattere2),
+    is_l(Carattere3),
+    is_l(Carattere4),
+    atomic_list_concat([Carattere1, Carattere2, Carattere3, Carattere4], Null).
+
+
+
+
 %%% value_parser riconosce un valore.
+/*
+Manca da riconoscere lo spazio finale dopo il valore
+
+ESEMPIO:    [' ',t,r,u,e,' '] ---> OK
+            [' ',t,r,u,e] ---> NO
+
+Attualmente riconosce entrambe le forme, va sistemato?
+*/
 
 value_parser([Spazio1 , Spazio2 | Resto], Valore, Resto) :-
     is_spazio(Spazio1),
@@ -146,5 +212,23 @@ value_parser([Spazio1 | AltriCaratteri], Valore, Resto) :-
     parser_q(AltriCaratteri, Valore, Resto),
     writeln("TROVATO NUMERO"),
     !.
+
+value_parser([Spazio1 | AltriCaratteri], Valore, Resto) :-
+    is_spazio(Spazio1),
+    parser_true(AltriCaratteri, Valore, Resto),
+    writeln("TROVATO TRUE").
+
+value_parser([Spazio1 | AltriCaratteri], Valore, Resto) :-
+    is_spazio(Spazio1),
+    parser_false(AltriCaratteri, Valore, Resto),
+    writeln("TROVATO FALSE").
+
+value_parser([Spazio1 | AltriCaratteri], Valore, Resto) :-
+    is_spazio(Spazio1),
+    parser_null(AltriCaratteri, Valore, Resto),
+    writeln("TROVATO NULL").
+
+
     
+%%% end of file
     
