@@ -142,8 +142,8 @@ is_r('r').
 is_u('u').
 is_e('e').
 
-parser_true([Carattere1, Carattere2, Carattere3, Carattere4 | _AltriCaratteri],
-            True, _Resto) :-
+parser_true([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
+            True, Resto) :-
     is_t(Carattere1),
     is_r(Carattere2),
     is_u(Carattere3),
@@ -159,7 +159,7 @@ is_s('s').
 % is_e/1 è già sopra
 
 parser_false([Carattere1, Carattere2, Carattere3, Carattere4, Carattere5
-            | _AltriCaratteri], False, _Resto) :-
+            | Resto], False, Resto) :-
     is_f(Carattere1),
     is_a(Carattere2),
     is_l(Carattere3),
@@ -175,8 +175,8 @@ is_n('n').
 % is_l/1 è già sopra
 % is_l/1 è già sopra
 
-parser_null([Carattere1, Carattere2, Carattere3, Carattere4 | _AltriCaratteri],
-            Null, _Resto) :-
+parser_null([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
+            Null, Resto) :-
     is_n(Carattere1),
     is_u(Carattere2),
     is_l(Carattere3),
@@ -184,51 +184,52 @@ parser_null([Carattere1, Carattere2, Carattere3, Carattere4 | _AltriCaratteri],
     atomic_list_concat([Carattere1, Carattere2, Carattere3, Carattere4], Null).
 
 
-
-
-%%% value_parser riconosce un valore.
-/*
-Manca da riconoscere lo spazio finale dopo il valore
-
-ESEMPIO:    [' ',t,r,u,e,' '] ---> OK
-            [' ',t,r,u,e] ---> NO
-
-Attualmente riconosce entrambe le forme, va sistemato?
-*/
+%%% value_parser/3 effettua il parser di un valore json. Mancano array ed objects
 
 value_parser([Spazio1 , Spazio2 | Resto], Valore, Resto) :-
     is_spazio(Spazio1),
     is_spazio(Spazio2),
     atomic_list_concat([Spazio1, Spazio2], Valore).
 
-value_parser([Spazio1 | AltriCaratteri], Valore, Resto) :-
+value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
     is_spazio(Spazio1),
     parser_string(AltriCaratteri, Valore, Resto),
+    nth0(0, Resto, Spazio2, RestoSenzaSpazio),
+    is_spazio(Spazio2),
     writeln("TROVATA STRINGA"),
     !.
 
-value_parser([Spazio1 | AltriCaratteri], Valore, Resto) :-
+value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
     is_spazio(Spazio1),
     parser_q(AltriCaratteri, Valore, Resto),
+    nth0(0, Resto, Spazio2, RestoSenzaSpazio),
+    is_spazio(Spazio2),
     writeln("TROVATO NUMERO"),
     !.
 
-value_parser([Spazio1 | AltriCaratteri], Valore, Resto) :-
+value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
     is_spazio(Spazio1),
     parser_true(AltriCaratteri, Valore, Resto),
-    writeln("TROVATO TRUE").
+    nth0(0, Resto, Spazio2, RestoSenzaSpazio),
+    is_spazio(Spazio2),
+    writeln("TROVATO TRUE"),
+    !.
 
-value_parser([Spazio1 | AltriCaratteri], Valore, Resto) :-
+value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
     is_spazio(Spazio1),
     parser_false(AltriCaratteri, Valore, Resto),
-    writeln("TROVATO FALSE").
+    nth0(0, Resto, Spazio2, RestoSenzaSpazio),
+    is_spazio(Spazio2),
+    writeln("TROVATO FALSE"),
+    !.
 
-value_parser([Spazio1 | AltriCaratteri], Valore, Resto) :-
+value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
     is_spazio(Spazio1),
     parser_null(AltriCaratteri, Valore, Resto),
-    writeln("TROVATO NULL").
-
-
+    nth0(0, Resto, Spazio2, RestoSenzaSpazio),
+    is_spazio(Spazio2),
+    writeln("TROVATO NULL"),
+    !.
     
 %%% end of file
     
