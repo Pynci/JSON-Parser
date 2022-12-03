@@ -230,6 +230,13 @@ value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
     is_spazio(Spazio2),
     writeln("TROVATO NULL"),
     !.
+
+value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
+    is_spazio(Spazio1),
+    array_parser(AltriCaratteri, Valore, Resto),
+    nth0(0, Resto, Spazio2, RestoSenzaSpazio),
+    is_spazio(Spazio2),
+    writeln("TROVATO ARRAY"),
+    !.
     
-%%% end of file
-    
+%%% end of file 
