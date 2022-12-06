@@ -24,7 +24,7 @@ array_parser([ApertaQuadra, Spazio, ChiusaQuadra | Resto],
 	     Risultato,
 	     Resto) :-
     is_quadra_aperta(ApertaQuadra),
-    is_spazio(Spazio),
+    is_whitespace(Spazio),
     is_quadra_chiusa(ChiusaQuadra),
     atomic_list_concat([ApertaQuadra, Spazio, ChiusaQuadra], Risultato),
     !.

@@ -8,6 +8,7 @@ is_virgolette('\"').
 is_spazio(' ').
 
 
+
 %%% parser_string/3 è definito da tre parametri:
 %   Sequenza_caratteri, Stringa, Resto.
 %   Sequenza_caratteri rappresenta la lista dei caratteri

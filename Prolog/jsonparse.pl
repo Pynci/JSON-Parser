@@ -12,17 +12,8 @@
 % trasformo subito la stringa in una lista di codici di caratteri
 % quanti e quali argomenti bisogna avere per poter parsare? 5 come gli interi?
 jsonparse(JSONString, Object) :-
-    string_codes(JSONString, ListOfCodes),
-    jsonparse(ListOfCodes, Object). % (?)
+    atom_codes(JSONString, ListOfCodes),
+    jsonparse(ListOfCodes, Object).
 
-jsonparse(ListOfCodes, Object) :-
-    % predicato per controllare se JSONString è una stringa
-
-jsonparse(ListOfCodes, Object) :-
-    % predicato per controllare se JSONString è un numero
-
-jsonparse(ListOfCodes, Object) :-
-    % predicato per controllare se JSONString è un oggetto JSON
-
-jsonparse(ListOfCodes, Object) :-
-    % predicato per controllare se JSONString è un array JSON
+jsonparse([X | Xs], Object) :-
+    %jsonarray...
