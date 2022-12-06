@@ -16,6 +16,16 @@ is_whitespace(X) :-
 %%% is_virgola/2 dice che ',' è una virgola
 is_virgola(',').
 
+
+%%% leggi_spazi/3 serve a scartare spazi e newline superflui
+%%% DA CONTINUARE
+leggi_spazi([Spazio | Resto], Resto) :-
+    is_whitespace(Spazio),
+    !.
+
+leggi_spazi()
+
+
 %%% array_parser/3 è il parser che riconosce se una lista di
 %   caratteri è un array
 
