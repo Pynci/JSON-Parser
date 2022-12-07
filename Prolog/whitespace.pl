@@ -24,9 +24,10 @@ trim_testa([Spazio | []], []) :-
     char_type(Spazio, space).
 
 %%% caso base: solo il primo primo carattere è di spaziatura
-trim_testa([Spazio, Carattere | Altro], [Spazio, Carattere | Altro]) :-
+trim_testa([Spazio, Carattere | Altro], [Carattere | Altro]) :-
     char_type(Spazio, space),
-    not(char_type(Carattere, space)).
+    not(char_type(Carattere, space)),
+    !.
 
 %%% se il primo carattere è di spaziatura lo scarto
 trim_testa([Spazio | Altro], NuovaLista) :-
