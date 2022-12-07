@@ -10,7 +10,7 @@
 
 is_spazio(' ').
 is_virgolette('\"').
-is_newline('\n').
+is_newline('\n').       %(?)
 is_quadra_aperta('[').
 is_quadra_chiusa(']').
 

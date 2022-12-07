@@ -7,6 +7,14 @@ is_virgolette('\"').
 %%% is_space/1 dice che ' ' è uno spazio
 is_spazio(' ').
 
+%%% is_newline/1 dice che '\n' è un newline
+is_newline('\n').
+
+%%% is_whitespace/1 riconosce i caratteri di spaziatura accettati
+is_whitespace(X) :-
+    is_spazio(X).
+is_whitespace(X) :-
+    is_newline(X).
 
 
 %%% parser_string/3 è definito da tre parametri:
@@ -138,10 +146,10 @@ true, false, null. Fammi sapere se è una merda poi cancella questo commento.
 */
 
 %%% parser che riconosce il valore "true"
-is_t('t').
-is_r('r').
-is_u('u').
-is_e('e').
+is_t(t).
+is_r(r).
+is_u(u).
+is_e(e).
 
 parser_true([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
             True, Resto) :-
@@ -153,10 +161,10 @@ parser_true([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
 
 
 %%% parser che riconosce il valore "false"
-is_f('f').
-is_a('a').
-is_l('l').
-is_s('s').
+is_f(f).
+is_a(a).
+is_l(l).
+is_s(s).
 % is_e/1 è già sopra
 
 parser_false([Carattere1, Carattere2, Carattere3, Carattere4, Carattere5
@@ -188,55 +196,55 @@ parser_null([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
 %%% value_parser/3 effettua il parser di un valore json. Mancano array ed objects
 
 value_parser([Spazio1 , Spazio2 | Resto], Valore, Resto) :-
-    is_spazio(Spazio1),
-    is_spazio(Spazio2),
+    is_whitespace(Spazio1),
+    is_whitespace(Spazio2),
     atomic_list_concat([Spazio1, Spazio2], Valore).
 
 value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
-    is_spazio(Spazio1),
+    is_whitespace(Spazio1),
     parser_string(AltriCaratteri, Valore, Resto),
     nth0(0, Resto, Spazio2, RestoSenzaSpazio),
-    is_spazio(Spazio2),
+    is_whitespace(Spazio2),
     writeln("TROVATA STRINGA"),
     !.
 
 value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
-    is_spazio(Spazio1),
+    is_whitespace(Spazio1),
     parser_q(AltriCaratteri, Valore, Resto),
     nth0(0, Resto, Spazio2, RestoSenzaSpazio),
-    is_spazio(Spazio2),
+    is_whitespace(Spazio2),
     writeln("TROVATO NUMERO"),
     !.
 
 value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
-    is_spazio(Spazio1),
+    is_whitespace(Spazio1),
     parser_true(AltriCaratteri, Valore, Resto),
     nth0(0, Resto, Spazio2, RestoSenzaSpazio),
-    is_spazio(Spazio2),
+    is_whitespace(Spazio2),
     writeln("TROVATO TRUE"),
     !.
 
 value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
-    is_spazio(Spazio1),
+    is_whitespace(Spazio1),
     parser_false(AltriCaratteri, Valore, Resto),
     nth0(0, Resto, Spazio2, RestoSenzaSpazio),
-    is_spazio(Spazio2),
+    is_whitespace(Spazio2),
     writeln("TROVATO FALSE"),
     !.
 
 value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
-    is_spazio(Spazio1),
+    is_whitespace(Spazio1),
     parser_null(AltriCaratteri, Valore, Resto),
     nth0(0, Resto, Spazio2, RestoSenzaSpazio),
-    is_spazio(Spazio2),
+    is_whitespace(Spazio2),
     writeln("TROVATO NULL"),
     !.
 
 value_parser([Spazio1 | AltriCaratteri], Valore, RestoSenzaSpazio) :-
-    is_spazio(Spazio1),
+    is_whitespace(Spazio1),
     array_parser(AltriCaratteri, Valore, Resto),
     nth0(0, Resto, Spazio2, RestoSenzaSpazio),
-    is_spazio(Spazio2),
+    is_whitespace(Spazio2),
     writeln("TROVATO ARRAY"),
     !.
     

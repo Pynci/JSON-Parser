@@ -1,0 +1,1 @@
+%%% Riconoscimento oggetto JSON
