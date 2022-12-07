@@ -6,6 +6,9 @@ trim(Atomo, ListaTrimmata) :-
     trim_testa(ListaCaratteri, TrimmataTesta),
     trim_coda(TrimmataTesta, ListaTrimmata).
 
+trim(Lista, ListaTrimmata) :-
+    trim_testa(Lista, TrimmataTesta),
+    trim_coda(TrimmataTesta, ListaTrimmata).
 
 %%% --- Implementazione trim_testa/2 e trim_coda/2 ---
 
