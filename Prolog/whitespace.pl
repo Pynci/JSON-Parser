@@ -2,9 +2,15 @@
 
 trim(Atomo, ListaTrimmata) :-
     atom(Atomo),
+    !,
     atom_chars(Atomo, ListaCaratteri),
     trim_testa(ListaCaratteri, TrimmataTesta),
     trim_coda(TrimmataTesta, ListaTrimmata).
+
+trim(Lista, ListaTrimmata) :-
+    atomic_list_concat(Lista, AtomoLista),
+    !,
+    trim(AtomoLista, ListaTrimmata).
 
 
 %%% --- Implementazione trim_testa/2 e trim_coda/2 ---
@@ -21,12 +27,14 @@ trim_testa([Carattere | Altro], [Carattere | Altro]) :-
 
 %%% caso base: non ci sono caratteri alfanumerici
 trim_testa([Spazio | []], []) :-
-    char_type(Spazio, space).
+    char_type(Spazio, space),
+    !.
 
 %%% caso base: solo il primo primo carattere è di spaziatura
-trim_testa([Spazio, Carattere | Altro], [Spazio, Carattere | Altro]) :-
+trim_testa([Spazio, Carattere | Altro], [Carattere | Altro]) :-
     char_type(Spazio, space),
-    not(char_type(Carattere, space)).
+    not(char_type(Carattere, space)),
+    !.
 
 %%% se il primo carattere è di spaziatura lo scarto
 trim_testa([Spazio | Altro], NuovaLista) :-

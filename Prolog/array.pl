@@ -4,39 +4,21 @@
 is_quadra_aperta('[').
 is_quadra_chiusa(']').
 
-%%% is_spazio/2 e is_newline/2 determinano i caratteri di spaziatura accettati
-is_newline('\n'). % non so se il newline si fa così (?)
-
-%%% is_whitespace/2 verifica che X sia un carattere di spaziatura accettato
-is_whitespace(X) :-
-    is_spazio(X).
-is_whitespace(X) :-
-    is_newline(X).
-
 %%% is_virgola/2 dice che ',' è una virgola
 is_virgola(',').
-
-
-%%% leggi_spazi/3 serve a scartare spazi e newline superflui
-%%% DA CONTINUARE
-leggi_spazi([Spazio | Resto], Resto) :-
-    is_whitespace(Spazio),
-    !.
-
-leggi_spazi()
-
 
 %%% array_parser/3 è il parser che riconosce se una lista di
 %   caratteri è un array
 
 % Se trova [ ] allora va bene
-array_parser([ApertaQuadra, Spazio, ChiusaQuadra | Resto],
+array_parser([ApertaQuadra | Altro],
 	     Risultato,
 	     Resto) :-
     is_quadra_aperta(ApertaQuadra),
-    is_whitespace(Spazio),
+    trim_testa(Altro, ChiusaQuadraResto),
+    nth0(0, ChiusaQuadraResto, ChiusaQuadra, Resto),
     is_quadra_chiusa(ChiusaQuadra),
-    atomic_list_concat([ApertaQuadra, Spazio, ChiusaQuadra], Risultato),
+    atomic_list_concat([ApertaQuadra, ChiusaQuadra], Risultato),
     !.
 
 % Se fallisce il caso di prima allora l'array non è vuoto
