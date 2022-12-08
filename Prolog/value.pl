@@ -224,7 +224,7 @@ parser_false([Carattere1, Carattere2, Carattere3, Carattere4, Carattere5
 
 
 %%% parser che riconosce il valore "null"
-is_n('n').
+is_n(n).
 % is_u/1 è già sopra
 % is_l/1 è già sopra
 % is_l/1 è già sopra

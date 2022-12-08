@@ -7,6 +7,7 @@ is_quadra_chiusa(']').
 %%% is_virgola/2 dice che ',' è una virgola
 is_virgola(',').
 
+
 %%% array_parser/3 è il parser che riconosce se una lista di
 %   caratteri è un array
 

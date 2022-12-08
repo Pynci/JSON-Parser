@@ -12,7 +12,6 @@ trim(Lista, ListaTrimmata) :-
     !,
     trim(AtomoLista, ListaTrimmata).
 
-
 %%% --- Implementazione trim_testa/2 e trim_coda/2 ---
 
 %%% trim_testa/2 rimuove le spaziature superflue in testa
