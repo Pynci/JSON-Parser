@@ -331,5 +331,12 @@ value_parser(Array, Valore, Resto) :-
     trim(RestoConSpazi, Resto),
     writeln("TROVATO ARRAY"),
     !.
+
+value_parser(Oggetto, Valore, Resto) :-
+    trim(Oggetto, OggettoTrimmato),
+    parser_object(OggettoTrimmato, Valore, RestoConSpazi),
+    trim(RestoConSpazi, Resto),
+    writeln("TROVATO ARRAY"),
+    !.
     
 %%% end of file 
