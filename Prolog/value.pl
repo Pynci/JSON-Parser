@@ -288,7 +288,23 @@ leggi_valori(ListaCaratteri, Risultato, Resto) :-
     atomic_concat(ValoreTrovato, QuadraChiusa, Risultato).
 
 
-%%% value_parser/3 effettua il parser di un valore json. Mancano objects
+%%% value_parser/3 effettua il parser di un valore json. Mancano objectsva
+
+value_parser(Array, Valore, Resto) :-
+    trim(Array, ArrayTrimmato),
+    array_parser(ArrayTrimmato, Valore, RestoConSpazi),
+    trim(RestoConSpazi, Resto),
+    writeln("TROVATO ARRAY"),
+    !.
+
+/*
+value_parser(Oggetto, Valore, Resto) :-
+    trim(Oggetto, OggettoTrimmato),
+    parser_object(OggettoTrimmato, Valore, RestoConSpazi),
+    trim(RestoConSpazi, Resto),
+    writeln("TROVATO ARRAY"),
+    !.
+*/
 
 value_parser(Stringa, Valore, Resto) :-
     trim(Stringa, StringaSenzaSpazi),
@@ -323,20 +339,6 @@ value_parser(Null, Valore, Resto) :-
     parser_null(NullTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
     writeln("TROVATO NULL"),
-    !.
-
-value_parser(Array, Valore, Resto) :-
-    trim(Array, ArrayTrimmato),
-    array_parser(ArrayTrimmato, Valore, RestoConSpazi),
-    trim(RestoConSpazi, Resto),
-    writeln("TROVATO ARRAY"),
-    !.
-
-value_parser(Oggetto, Valore, Resto) :-
-    trim(Oggetto, OggettoTrimmato),
-    parser_object(OggettoTrimmato, Valore, RestoConSpazi),
-    trim(RestoConSpazi, Resto),
-    writeln("TROVATO ARRAY"),
     !.
     
 %%% end of file 

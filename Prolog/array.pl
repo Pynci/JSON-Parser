@@ -10,6 +10,8 @@ is_virgola(',').
 
 %%% array_parser/3 è il parser che riconosce se una lista di
 %   caratteri è un array
+
+% Se in ingresso arriva un atomo, lo trasforma in una lista di caratteri
 array_parser(Atomo, Risultato, Resto) :-
     atom(Atomo),
     atom_chars(Atomo, ListaCaratteri),
