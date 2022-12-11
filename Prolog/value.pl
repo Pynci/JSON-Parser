@@ -279,8 +279,6 @@ leggi_elementi(ListaCaratteri, [ValoreTrovato], Resto) :-
     nth0(0, AltriCaratteri, QuadraChiusa, Resto),
     is_quadra_chiusa(QuadraChiusa).
 
-%%% DA SISTEMARE (ISSUE #11)
-
 %%% --- Fine implementazione array_parser/3 ---
 
 

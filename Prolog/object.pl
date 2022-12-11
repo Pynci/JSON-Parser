@@ -1,9 +1,5 @@
 %%% -*- Mode: Prolog -*-
 
-pair(SequenzaChiave, SequenzaValore) :-
-    parser_string(SequenzaChiave, _X, []),
-    value_parser(SequenzaValore, _Y, []).
-
 is_aperta_graffa('{').
 is_chiusa_graffa('}').
 is_double_point(':').

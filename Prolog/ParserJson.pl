@@ -63,6 +63,20 @@ parser_value(Numero, Valore, Resto) :-
     %writeln("TROVATO NUMERO"),
     !.
 
+parser_value(Oggetto, Valore, Resto) :-
+    trim(Oggetto, OggettoTrimmato),
+    parser_object(OggettoTrimmato, Valore, RestoConSpazi),
+    trim(RestoConSpazi, Resto),
+    %writeln("TROVATO OGGETTO"),
+    !.
+
+parser_value(Array, Valore, Resto) :-
+    trim(Array, ArrayTrimmato),
+    array_parser(ArrayTrimmato, Valore, RestoConSpazi),
+    trim(RestoConSpazi, Resto),
+    writeln("TROVATO ARRAY"),
+    !.
+
 %%%% ---- fine PARSING JSON ----
 
 
@@ -72,13 +86,12 @@ parser_value(Numero, Valore, Resto) :-
 parser_string([Virgolette | AltriCaratteri], Stringa, Resto) :-
     is_virgolette(Virgolette),
     leggi_stringa(AltriCaratteri, Letta, Resto),
-    append([Virgolette], Letta, ListaStringa),
-    atomic_list_concat(ListaStringa, Stringa).
-
+    atomic_list_concat(Letta, AtomoStringa),
+    atom_string(AtomoStringa, Stringa).
 
 %%% leggi_stringa/3 serve a leggere i caratteri e le virgolette di chiusura
 
-leggi_stringa([Virgolette | Resto], [Virgolette], Resto) :-
+leggi_stringa([Virgolette | Resto], [], Resto) :-
     is_virgolette(Virgolette),
     !.
 
@@ -156,21 +169,82 @@ parser_decimale([Punto | Altro], ['.' | ListaDecimali], Resto) :-
     !,
     parse_n(Altro, [], _Decimale, ListaDecimali, Resto).
 
-parser_decimale([Carattere | Altro], ['.' , '0'], [Carattere | Altro]).
+parser_decimale([Carattere | Altro], [], [Carattere | Altro]).
 
-parser_decimale([], ['.' , '0'], []).
+parser_decimale([], [], []).
 
 %%%% ---- fine PARSING NUMERI ----
 
 
 
-
 %%%% ---- inizio PARSING OGGETTO ----
 
+parser_object([Graffa | Sequenza], jsonobj(), Resto) :-
+    is_aperta_graffa(Graffa),
+    trim_testa(Sequenza, GraffaAltro),
+    nth0(0, GraffaAltro, ChiusaGraffa, Resto),
+    is_chiusa_graffa(ChiusaGraffa).
 
+parser_object([Graffa | Sequenza], jsonobj(Coppie), Resto) :-
+    is_aperta_graffa(Graffa),
+    trim_testa(Sequenza, SequenzaSenzaSpazi),
+    leggi_coppie(SequenzaSenzaSpazi, Coppie, Resto).
+
+leggi_coppie(Sequenza, [pair(Chiave, ValoreLetto) | CoppieLette], Resto) :-
+    parser_string(Sequenza, Chiave, Altro),
+    trim_testa(Altro, AltroSenzaSpazi),
+    nth0(0, AltroSenzaSpazi, DuePunti, Valore),
+    is_double_point(DuePunti),
+    parser_value(Valore, ValoreLetto, VirgolaAltraCoppia),
+    nth0(0, VirgolaAltraCoppia, Virgola, SpazioAltraCoppia),
+    is_virgola(Virgola),
+    trim_testa(SpazioAltraCoppia, AltraCoppia),
+    leggi_coppie(AltraCoppia, CoppieLette, Resto),
+    !.
+
+leggi_coppie(Sequenza, [pair(Chiave, ValoreLetto)], Resto) :-
+    parser_string(Sequenza, Chiave, Altro),
+    trim_testa(Altro, AltroSenzaSpazi),
+    nth0(0, AltroSenzaSpazi, DuePunti, Valore),
+    is_double_point(DuePunti),
+    parser_value(Valore, ValoreLetto, GraffaChiusaResto),
+    nth0(0, GraffaChiusaResto, Graffa, Resto),
+    is_chiusa_graffa(Graffa).
 
 %%%% ---- fine PARSING OGGETTO ----
 
+
+
+%%%% ---- inizio PARSING ARRAY ----
+
+array_parser([ApertaQuadra | SpaziAltro], jsonarray([]), Resto) :-
+    is_quadra_aperta(ApertaQuadra),
+    trim_testa(SpaziAltro, Altro),
+    nth0(0, Altro, ChiusaQuadra, Resto),
+    is_quadra_chiusa(ChiusaQuadra),
+    !.
+
+array_parser([ApertaQuadra | Altro], jsonarray(ListaElementi), Resto) :-
+    is_quadra_aperta(ApertaQuadra),
+    leggi_elementi(Altro, ListaElementi, Resto).
+
+% Legge un valore se poi trova la virgola allora deve richiamare
+% il predicato ricorsivamente.
+leggi_elementi(ListaCaratteri, [ValoreTrovato | ValoriLetti], Resto) :-
+    parser_value(ListaCaratteri, ValoreTrovato, AltriCaratteri),
+    nth0(0, AltriCaratteri, Virgola, AltroValore),
+    is_virgola(Virgola),
+    leggi_elementi(AltroValore, ValoriLetti, Resto),
+    !.
+
+% Legge un valore se poi trova la parentesi quadra chiusa allora
+% si ferma.
+leggi_elementi(ListaCaratteri, [ValoreTrovato], Resto) :-
+    parser_value(ListaCaratteri, ValoreTrovato, AltriCaratteri),
+    nth0(0, AltriCaratteri, QuadraChiusa, Resto),
+    is_quadra_chiusa(QuadraChiusa).
+
+%%%% ---- inizio PARSING ARRAY ----
 
 
 
