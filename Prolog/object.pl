@@ -28,7 +28,8 @@ leggi_coppie(Sequenza, [pair(Chiave, ValoreLetto) | CoppieLette], Resto) :-
     nth0(0, VirgolaAltraCoppia, Virgola, SpazioAltraCoppia),
     is_virgola(Virgola),
     trim_testa(SpazioAltraCoppia, AltraCoppia),
-    leggi_coppie(AltraCoppia, CoppieLette, Resto).
+    leggi_coppie(AltraCoppia, CoppieLette, Resto),
+    !.
 
 leggi_coppie(Sequenza, [pair(Chiave, ValoreLetto)], Resto) :-
     parser_string(Sequenza, Chiave, Altro),

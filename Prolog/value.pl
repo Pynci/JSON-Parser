@@ -269,7 +269,8 @@ leggi_elementi(ListaCaratteri, [ValoreTrovato | ValoriLetti], Resto) :-
     value_parser(ListaCaratteri, ValoreTrovato, AltriCaratteri),
     nth0(0, AltriCaratteri, Virgola, AltroValore),
     is_virgola(Virgola),
-    leggi_elementi(AltroValore, ValoriLetti, Resto).
+    leggi_elementi(AltroValore, ValoriLetti, Resto),
+    !.
 
 % Legge un valore se poi trova la parentesi quadra chiusa allora
 % si ferma.

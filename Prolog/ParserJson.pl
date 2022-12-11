@@ -53,7 +53,7 @@ parser_value(Stringa, Valore, Resto) :-
     trim(Stringa, StringaSenzaSpazi),
     parser_string(StringaSenzaSpazi, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    writeln("TROVATA STRINGA"),
+    %writeln("TROVATA STRINGA"),
     !.
 
 parser_value(Numero, Valore, Resto) :-
@@ -161,6 +161,16 @@ parser_decimale([Carattere | Altro], ['.' , '0'], [Carattere | Altro]).
 parser_decimale([], ['.' , '0'], []).
 
 %%%% ---- fine PARSING NUMERI ----
+
+
+
+
+%%%% ---- inizio PARSING OGGETTO ----
+
+
+
+%%%% ---- fine PARSING OGGETTO ----
+
 
 
 
