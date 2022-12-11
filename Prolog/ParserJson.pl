@@ -1,7 +1,7 @@
 %%% FILE DI TEST
 % questo è un file di test in cui provare diverse combinazioni di ciò che
 % abbiamo implementato fino ad adesso.
-% Verrà usato per cercare di rispondere alle issue #9 e #10 senza pasticciare
+% Verrà usato per cercare di rispondere alle issue #9, #10 e #11 senza smerdare
 % quello che è già stato sviluppato negli altri file
 
 %%% DISCLAIMER
