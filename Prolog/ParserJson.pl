@@ -74,7 +74,28 @@ parser_value(Array, Valore, Resto) :-
     trim(Array, ArrayTrimmato),
     array_parser(ArrayTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    writeln("TROVATO ARRAY"),
+    %writeln("TROVATO ARRAY"),
+    !.
+
+parser_value(True, Valore, Resto) :-
+    trim(True, TrueTrimmato),
+    parser_true(TrueTrimmato, Valore, RestoConSpazi),
+    trim(RestoConSpazi, Resto),
+    %writeln("TROVATO TRUE"),
+    !.
+
+parser_value(False, Valore, Resto) :-
+    trim(False, FalseTrimmato),
+    parser_false(FalseTrimmato, Valore, RestoConSpazi),
+    trim(RestoConSpazi, Resto),
+    %writeln("TROVATO FALSE"),
+    !.
+
+parser_value(Null, Valore, Resto) :-
+    trim(Null, NullTrimmato),
+    parser_null(NullTrimmato, Valore, RestoConSpazi),
+    trim(RestoConSpazi, Resto),
+    %writeln("TROVATO NULL"),
     !.
 
 %%%% ---- fine PARSING JSON ----
@@ -245,6 +266,50 @@ leggi_elementi(ListaCaratteri, [ValoreTrovato], Resto) :-
     is_quadra_chiusa(QuadraChiusa).
 
 %%%% ---- inizio PARSING ARRAY ----
+
+
+
+%%%% ---- inizio PARSING TRUE ----
+
+parser_true([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
+            True, Resto) :-
+    is_t(Carattere1),
+    is_r(Carattere2),
+    is_u(Carattere3),
+    is_e(Carattere4),
+    atomic_list_concat([Carattere1, Carattere2, Carattere3, Carattere4], True).
+
+%%%% ---- fine PARSING TRUE ----
+
+
+
+%%%% ---- inizio PARSING FALSE ----
+
+parser_false([Carattere1, Carattere2, Carattere3, Carattere4, Carattere5
+            | Resto], False, Resto) :-
+    is_f(Carattere1),
+    is_a(Carattere2),
+    is_l(Carattere3),
+    is_s(Carattere4),
+    is_e(Carattere5),
+    atomic_list_concat([Carattere1, Carattere2, Carattere3, 
+                        Carattere4, Carattere5], False).
+
+%%%% ---- fine PARSING FALSE ----
+
+
+
+%%%% ---- inizio PARSING NULL ----
+
+parser_null([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
+            Null, Resto) :-
+    is_n(Carattere1),
+    is_u(Carattere2),
+    is_l(Carattere3),
+    is_l(Carattere4),
+    atomic_list_concat([Carattere1, Carattere2, Carattere3, Carattere4], Null).
+
+%%%% ---- fine PARSING NULL ----
 
 
 
