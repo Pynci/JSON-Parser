@@ -54,14 +54,17 @@ trim_coda(ListaDaTrimmare, ListaTrimmata) :-
 
 %%% reverse/2 inverte una lista
 reverse(Lista, ListaInvertita) :-
-    reverse(Lista, [], ListaInvertita).
+    reverse(Lista, [], ListaInvertita),
+    !.
 
 %%% reverse/3 fa da supporto a reverse/2
 reverse([], ListaInvertita, ListaInvertita).
 reverse([Carattere | Resto], Accumulatore, ListaInvertita) :-
-    reverse(Resto, [Carattere | Accumulatore], ListaInvertita).
+    reverse(Resto, [Carattere | Accumulatore], ListaInvertita),
+    !.
 
 %%% --- Fine implementazione trim_testa/2 e trim_coda/2 ---
+
 
 %%% is_virgolette/1 dice che '"' è una virgoletta
 is_virgolette('\"').
@@ -238,6 +241,10 @@ parser_null([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
     atomic_list_concat([Carattere1, Carattere2, Carattere3, Carattere4], Null).
 
 
+
+%%% --- Inizio implementazione array_parser/3 ---
+
+
 %%% is_quadra_aperta/2 e is_quadra_chiusa/2 dicono che '[' e ']' sono le quadre
 is_quadra_aperta('[').
 is_quadra_chiusa(']').
@@ -245,47 +252,36 @@ is_quadra_chiusa(']').
 %%% is_virgola/2 dice che ',' è una virgola
 is_virgola(',').
 
-%%% array_parser/3 è il parser che riconosce se una lista di
-%   caratteri è un array
-
-% Se trova [ ] allora va bene
-array_parser([ApertaQuadra | Altro],
-	     Risultato,
-	     Resto) :-
+array_parser([ApertaQuadra | SpaziAltro], jsonarray([]), Resto) :-
     is_quadra_aperta(ApertaQuadra),
-    trim_testa(Altro, ChiusaQuadraResto),
-    nth0(0, ChiusaQuadraResto, ChiusaQuadra, Resto),
+    trim_testa(SpaziAltro, Altro),
+    nth0(0, Altro, ChiusaQuadra, Resto),
     is_quadra_chiusa(ChiusaQuadra),
-    atomic_list_concat([ApertaQuadra, ChiusaQuadra], Risultato),
     !.
 
-% Se fallisce il caso di prima allora l'array non è vuoto
-array_parser([ApertaQuadra | AltriCaratteri],
-	     Risultato,
-	     Resto) :-
+array_parser([ApertaQuadra | Altro], jsonarray(ListaElementi), Resto) :-
     is_quadra_aperta(ApertaQuadra),
-    leggi_valori(AltriCaratteri, ValoriLetti, Resto),
-    atomic_list_concat([ApertaQuadra, ValoriLetti], Risultato),
-    !.
-
-% leggi_valori/3 serve a leggere i valori presenti nell'array
+    leggi_elementi(Altro, ListaElementi, Resto).
 
 % Legge un valore se poi trova la virgola allora deve richiamare
 % il predicato ricorsivamente.
-leggi_valori(ListaCaratteri, Risultato, Resto) :-
+leggi_elementi(ListaCaratteri, [ValoreTrovato | ValoriLetti], Resto) :-
     value_parser(ListaCaratteri, ValoreTrovato, AltriCaratteri),
     nth0(0, AltriCaratteri, Virgola, AltroValore),
     is_virgola(Virgola),
-    leggi_valori(AltroValore, ValoriLetti, Resto),
-    atomic_list_concat([ValoreTrovato, Virgola, ValoriLetti], Risultato).
+    leggi_elementi(AltroValore, ValoriLetti, Resto).
 
 % Legge un valore se poi trova la parentesi quadra chiusa allora
 % si ferma.
-leggi_valori(ListaCaratteri, Risultato, Resto) :-
+leggi_elementi(ListaCaratteri, ValoreTrovato, Resto) :-
     value_parser(ListaCaratteri, ValoreTrovato, AltriCaratteri),
     nth0(0, AltriCaratteri, QuadraChiusa, Resto),
-    is_quadra_chiusa(QuadraChiusa),
-    atomic_concat(ValoreTrovato, QuadraChiusa, Risultato).
+    is_quadra_chiusa(QuadraChiusa).
+
+%%% DA SISTEMARE (ISSUE #11)
+
+%%% --- Fine implementazione array_parser/3 ---
+
 
 
 %%% value_parser/3 effettua il parser di un valore json. Mancano objectsva
@@ -297,14 +293,14 @@ value_parser(Array, Valore, Resto) :-
     writeln("TROVATO ARRAY"),
     !.
 
-/*
+
 value_parser(Oggetto, Valore, Resto) :-
     trim(Oggetto, OggettoTrimmato),
     parser_object(OggettoTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    writeln("TROVATO ARRAY"),
+    writeln("TROVATO OGGETTO"),
     !.
-*/
+
 
 value_parser(Stringa, Valore, Resto) :-
     trim(Stringa, StringaSenzaSpazi),

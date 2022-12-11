@@ -2,7 +2,7 @@
 
 pair(SequenzaChiave, SequenzaValore) :-
     parser_string(SequenzaChiave, _X, []),
-    parser_value(SequenzaValore, _Y, []).
+    value_parser(SequenzaValore, _Y, []).
 
 is_aperta_graffa('{').
 is_chiusa_graffa('}').

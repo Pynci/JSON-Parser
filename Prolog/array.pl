@@ -7,15 +7,8 @@ is_quadra_chiusa(']').
 %%% is_virgola/2 dice che ',' è una virgola
 is_virgola(',').
 
-
 %%% array_parser/3 è il parser che riconosce se una lista di
 %   caratteri è un array
-
-% Se in ingresso arriva un atomo, lo trasforma in una lista di caratteri
-array_parser(Atomo, Risultato, Resto) :-
-    atom(Atomo),
-    atom_chars(Atomo, ListaCaratteri),
-    array_parser(ListaCaratteri, Risultato, Resto).
 
 % Se trova [ ] allora va bene
 array_parser([ApertaQuadra | Altro],
@@ -55,8 +48,3 @@ leggi_valori(ListaCaratteri, Risultato, Resto) :-
     nth0(0, AltriCaratteri, QuadraChiusa, Resto),
     is_quadra_chiusa(QuadraChiusa),
     atomic_concat(ValoreTrovato, QuadraChiusa, Risultato).
-    
-    
-    
-    
-    
