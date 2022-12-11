@@ -273,7 +273,7 @@ leggi_elementi(ListaCaratteri, [ValoreTrovato | ValoriLetti], Resto) :-
 
 % Legge un valore se poi trova la parentesi quadra chiusa allora
 % si ferma.
-leggi_elementi(ListaCaratteri, ValoreTrovato, Resto) :-
+leggi_elementi(ListaCaratteri, [ValoreTrovato], Resto) :-
     value_parser(ListaCaratteri, ValoreTrovato, AltriCaratteri),
     nth0(0, AltriCaratteri, QuadraChiusa, Resto),
     is_quadra_chiusa(QuadraChiusa).
