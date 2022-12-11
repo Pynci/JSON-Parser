@@ -50,12 +50,14 @@ trim_coda(ListaDaTrimmare, ListaTrimmata) :-
 
 %%% reverse/2 inverte una lista
 reverse(Lista, ListaInvertita) :-
-    reverse(Lista, [], ListaInvertita).
+    reverse(Lista, [], ListaInvertita),
+    !.
 
 %%% reverse/3 fa da supporto a reverse/2
 reverse([], ListaInvertita, ListaInvertita).
 reverse([Carattere | Resto], Accumulatore, ListaInvertita) :-
-    reverse(Resto, [Carattere | Accumulatore], ListaInvertita).
+    reverse(Resto, [Carattere | Accumulatore], ListaInvertita),
+    !.
 
 %%% --- Fine implementazione trim_testa/2 e trim_coda/2 ---
 
