@@ -211,7 +211,7 @@ parser_object([Graffa | Sequenza], jsonobj(Coppie), Resto) :-
     trim_testa(Sequenza, SequenzaSenzaSpazi),
     leggi_coppie(SequenzaSenzaSpazi, Coppie, Resto).
 
-leggi_coppie(Sequenza, [pair(Chiave, ValoreLetto) | CoppieLette], Resto) :-
+leggi_coppie(Sequenza, [','(Chiave, ValoreLetto) | CoppieLette], Resto) :-
     parser_string(Sequenza, Chiave, Altro),
     trim_testa(Altro, AltroSenzaSpazi),
     nth0(0, AltroSenzaSpazi, DuePunti, Valore),
@@ -223,7 +223,7 @@ leggi_coppie(Sequenza, [pair(Chiave, ValoreLetto) | CoppieLette], Resto) :-
     leggi_coppie(AltraCoppia, CoppieLette, Resto),
     !.
 
-leggi_coppie(Sequenza, [pair(Chiave, ValoreLetto)], Resto) :-
+leggi_coppie(Sequenza, [','(Chiave, ValoreLetto)], Resto) :-
     parser_string(Sequenza, Chiave, Altro),
     trim_testa(Altro, AltroSenzaSpazi),
     nth0(0, AltroSenzaSpazi, DuePunti, Valore),
