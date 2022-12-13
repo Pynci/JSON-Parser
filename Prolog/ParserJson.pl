@@ -102,6 +102,57 @@ parser_value(Null, Valore, Resto) :-
 
 
 
+%%%% ---- inizio ACCESSO JSON ----
+
+jsonaccess(jsonobj(X), [], jsonobj(X)).
+
+jsonaccess(jsonobj([','(Stringa, Risultato) | _]), [Stringa], Risultato) :- !.
+
+jsonaccess(jsonobj([','(_Chiave, _Valore) | AltreCoppie]), [Stringa], Risultato) :-
+    jsonaccess(jsonobj(AltreCoppie), [Stringa], Risultato).
+
+jsonaccess(jsonobj([','(Stringa, jsonobj(AltreCoppie)) | _]), [Stringa | AltreStringhe], Risultato) :-
+    jsonaccess(jsonobj(AltreCoppie), AltreStringhe, Risultato),
+    !.
+
+jsonaccess(jsonobj([','(_Chiave, _Valore) | AltreCoppie]), [Stringa | AltreStringhe], Risultato) :-
+    jsonaccess(jsonobj(AltreCoppie), [Stringa | AltreStringhe], Risultato),
+    !.
+
+jsonaccess(jsonobj([','(Stringa, jsonarray(Lista)) | _]), [Stringa, Numero], Risultato) :-
+    number(Numero),
+    !,
+    nth0(Numero, Lista, Risultato, _).
+
+jsonaccess(jsonobj([','(_Chiave, _Valore) | AltreCoppie]), [Stringa, Numero], Risultato) :-
+    number(Numero),
+    !,
+    jsonaccess(jsonbj(AltreCoppie), [Stringa, Numero], Risultato).
+
+
+jsonaccess(jsonobj([','(Stringa, jsonarray(Lista)) | _]), 
+            [Stringa, Numero | AltriCampi], Risultato) :-
+    number(Numero),
+    !,
+    nth0(Numero, Lista, jsonobj(Altro)),
+    jsonaccess(jsonobj(Altro), AltriCampi, Risultato).
+
+jsonaccess(jsonobj(','(_Chiave, _Valore) | AltreCoppie),
+            [Stringa, Numero | AltriCampi], Risultato) :-
+    number(Numero),
+    !,
+    jsonaccess(jsonobj(AltreCoppie), [Stringa, Numero | AltriCampi], Risultato).
+
+
+jsonaccess(jsonobj(X), Stringa, Risultato) :-
+    string(Stringa),
+    jsonaccess(jsonobj(X), [Stringa], Risultato),
+    !.
+
+%%%% ---- fine ACCESSO JSON ----
+
+
+
 %%%% ---- inizio PARSING STRINGHE ----
 
 parser_string([Virgolette | AltriCaratteri], Stringa, Resto) :-
