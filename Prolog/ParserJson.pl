@@ -72,7 +72,7 @@ parser_value(Oggetto, Valore, Resto) :-
 
 parser_value(Array, Valore, Resto) :-
     trim(Array, ArrayTrimmato),
-    array_parser(ArrayTrimmato, Valore, RestoConSpazi),
+    parser_array(ArrayTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
     %writeln("TROVATO ARRAY"),
     !.
@@ -289,14 +289,14 @@ leggi_coppie(Sequenza, [','(Chiave, ValoreLetto)], Resto) :-
 
 %%%% ---- inizio PARSING ARRAY ----
 
-array_parser([ApertaQuadra | SpaziAltro], jsonarray([]), Resto) :-
+parser_array([ApertaQuadra | SpaziAltro], jsonarray([]), Resto) :-
     is_quadra_aperta(ApertaQuadra),
     trim_testa(SpaziAltro, Altro),
     nth0(0, Altro, ChiusaQuadra, Resto),
     is_quadra_chiusa(ChiusaQuadra),
     !.
 
-array_parser([ApertaQuadra | Altro], jsonarray(ListaElementi), Resto) :-
+parser_array([ApertaQuadra | Altro], jsonarray(ListaElementi), Resto) :-
     is_quadra_aperta(ApertaQuadra),
     leggi_elementi(Altro, ListaElementi, Resto).
 
