@@ -1,2 +1,1 @@
-{"nome" : "Arthur", "cognome" : "Dent"}.
-    
+{"Ciao":1234}.
