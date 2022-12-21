@@ -2,6 +2,11 @@
 
 %%% Inizio implementazione inverti/2
 
+inverti(Stringa, StringaAtomizzata) :-
+    string(Stringa),
+    atomic_list_concat(['"', Stringa, '"'], StringaAtomizzata),
+    !.
+
 inverti(Numero, Numero) :-
     number(Numero),
     !.
@@ -22,18 +27,20 @@ inverti(jsonobj([]), Risultato) :-
     atomic_list_concat(['{', '}'], Risultato),
     !.
 
+/*
 inverti(jsonobj([','(Chiave, Valore)]), Risultato) :-
     string(Chiave),
     string(Valore),
     !,
     atomic_list_concat(['{', '"', Chiave, '"', ':', '"', Valore, '"','}'], Risultato).
+*/
 
 inverti(jsonobj([','(Chiave, Valore)]), Risultato) :-
     string(Chiave),
     inverti(Valore, ValoreInvertito),
     !,
     atomic_list_concat(['{', '"', Chiave, '"', ':', ValoreInvertito,'}'], Risultato).
-
+/*
 inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
     string(Chiave),
     string(Valore),
@@ -43,6 +50,7 @@ inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
     nth0(0, ListaCaratteriRisultato, _Graffa, CaratteriRimanenti),
     atom_chars(AtomoCaratteriRimanenti, CaratteriRimanenti),
     atomic_list_concat(['{', '"', Chiave, '"', Valore, ',', AtomoCaratteriRimanenti], Risultato).
+*/
 
 inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
     string(Chiave),
@@ -52,7 +60,7 @@ inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
     atom_chars(Risultato1, ListaCaratteriRisultato),
     nth0(0, ListaCaratteriRisultato, _Graffa, CaratteriRimanenti),
     atom_chars(AtomoCaratteriRimanenti, CaratteriRimanenti),
-    atomic_list_concat(['{', '"', Chiave, '"', ':', '"', ValoreInvertito, '"', ',', AtomoCaratteriRimanenti], Risultato).
+    atomic_list_concat(['{', '"', Chiave, '"', ':', ValoreInvertito, ',', AtomoCaratteriRimanenti], Risultato).
 
 inverti(jsonarray([]), Risultato) :-
     atomic_list_concat(['[', ']'], Risultato),
