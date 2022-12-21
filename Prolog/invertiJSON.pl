@@ -27,30 +27,11 @@ inverti(jsonobj([]), Risultato) :-
     atomic_list_concat(['{', '}'], Risultato),
     !.
 
-/*
-inverti(jsonobj([','(Chiave, Valore)]), Risultato) :-
-    string(Chiave),
-    string(Valore),
-    !,
-    atomic_list_concat(['{', '"', Chiave, '"', ':', '"', Valore, '"','}'], Risultato).
-*/
-
 inverti(jsonobj([','(Chiave, Valore)]), Risultato) :-
     string(Chiave),
     inverti(Valore, ValoreInvertito),
     !,
     atomic_list_concat(['{', '"', Chiave, '"', ':', ValoreInvertito,'}'], Risultato).
-/*
-inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
-    string(Chiave),
-    string(Valore),
-    !,
-    inverti(jsonobj(Altro), Risultato1),
-    atom_chars(Risultato1, ListaCaratteriRisultato),
-    nth0(0, ListaCaratteriRisultato, _Graffa, CaratteriRimanenti),
-    atom_chars(AtomoCaratteriRimanenti, CaratteriRimanenti),
-    atomic_list_concat(['{', '"', Chiave, '"', Valore, ',', AtomoCaratteriRimanenti], Risultato).
-*/
 
 inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
     string(Chiave),
