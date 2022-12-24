@@ -2,9 +2,11 @@
 
 %%% Inizio implementazione inverti/2
 
-inverti(Stringa, StringaAtomizzata) :-
-    string(Stringa),
-    atomic_list_concat(['"', Stringa, '"'], StringaAtomizzata),
+inverti(Stringa, StringaFinale) :-
+    %atomic_list_concat(['"', Stringa, '"'], StringaAtomizzata),
+    string_concat("\"", Stringa, Stringa1),
+    string_concat(Stringa1, "\"", StringaFinale),
+    string(StringaFinale),
     !.
 
 inverti(Numero, Numero) :-
