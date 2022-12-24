@@ -19,9 +19,7 @@ is_virgola(',').
 is_aperta_graffa('{').
 is_chiusa_graffa('}').
 is_double_point(':').
-
-
-
+is_backslash('\\').
 
 %%%% ---- inizio PARSING JSON ----
 
@@ -166,6 +164,12 @@ parser_string([Virgolette | AltriCaratteri], Stringa, Resto) :-
 leggi_stringa([Virgolette | Resto], [], Resto) :-
     is_virgolette(Virgolette),
     !.
+
+leggi_stringa([BackSlash, Carattere | Altro], [Carattere | LettiPrecedentemente], Resto) :-
+    is_backslash(BackSlash),
+    !,
+    char_type(Carattere, ascii),
+    leggi_stringa(Altro, LettiPrecedentemente, Resto).
 
 leggi_stringa([Carattere | Altro], [Carattere | LettiPrecedentemente], Resto) :-
     char_type(Carattere, ascii),
