@@ -12,6 +12,7 @@
 
 % predicati is
 is_virgolette('\"').
+is_backslash('\\').
 is_meno('-').
 is_punto('.').
 is_t(t).
@@ -167,10 +168,13 @@ jsonaccess(jsonobj(X), Stringa, Risultato) :-
 
 %%% Inizio implementazione inverti/2
 
-inverti(Stringa, StringaAtomizzata) :-
+inverti(Stringa, StringaFinale) :-
     string(Stringa),
-    atomic_list_concat(['"', Stringa, '"'], StringaAtomizzata),
-    !.
+    !,
+    string_chars(Stringa, ListaDaArricchire),
+    arricchisci_stringa(ListaDaArricchire, ListaArricchita),
+    atom_chars(Atomo, ListaArricchita),
+    atomic_list_concat(['"', Atomo, '"'], StringaFinale).
 
 inverti(Numero, Numero) :-
     number(Numero),
@@ -194,19 +198,25 @@ inverti(jsonobj([]), Risultato) :-
 
 inverti(jsonobj([','(Chiave, Valore)]), Risultato) :-
     string(Chiave),
+    string_chars(Chiave, ListaDaArricchireChiave),
+    arricchisci_stringa(ListaDaArricchireChiave, ListaArricchitaChiave),
+    atom_chars(AtomoChiave, ListaArricchitaChiave),
     inverti(Valore, ValoreInvertito),
     !,
-    atomic_list_concat(['{', '"', Chiave, '"', ':', ValoreInvertito,'}'], Risultato).
+    atomic_list_concat(['{', '"', AtomoChiave, '"', ':', ValoreInvertito,'}'], Risultato).
 
 inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
     string(Chiave),
+    string_chars(Chiave, ListaDaArricchireChiave),
+    arricchisci_stringa(ListaDaArricchireChiave, ListaArricchitaChiave),
+    atom_chars(AtomoChiave, ListaArricchitaChiave),
     inverti(Valore, ValoreInvertito),
     !,
     inverti(jsonobj(Altro), Risultato1),
     atom_chars(Risultato1, ListaCaratteriRisultato),
     nth0(0, ListaCaratteriRisultato, _Graffa, CaratteriRimanenti),
     atom_chars(AtomoCaratteriRimanenti, CaratteriRimanenti),
-    atomic_list_concat(['{', '"', Chiave, '"', ':', ValoreInvertito, ',', AtomoCaratteriRimanenti], Risultato).
+    atomic_list_concat(['{', '"', AtomoChiave, '"', ':', ValoreInvertito, ',', AtomoCaratteriRimanenti], Risultato).
 
 inverti(jsonarray([]), Risultato) :-
     atomic_list_concat(['[', ']'], Risultato),
@@ -240,14 +250,29 @@ inverti(jsonarray([Valore | Altro]), Risultato) :-
     atom_chars(AtomoCaratteriRimanenti, CaratteriRimanenti),
     atomic_list_concat(['[', '"', Valore, '"', ',', AtomoCaratteriRimanenti], Risultato).
 
+
 %%% Fine implementazione inverti/2
+
+%%% arricchisci_stringa/2 è un predicato di supporto
+
+arricchisci_stringa([], []).
+
+arricchisci_stringa([Carattere1 | AltriCaratteri], ['\\', '\\', Carattere1 | Altro]) :-
+    is_virgolette(Carattere1),
+    !,
+    arricchisci_stringa(AltriCaratteri, Altro).
+
+arricchisci_stringa([Carattere1 | AltriCaratteri], [Carattere1 | Risultato]) :-
+    arricchisci_stringa(AltriCaratteri, Risultato).
 
 %%% jsondump/2 consente di stampare JSON su file
 
 jsondump(JSON, FileName) :-
     inverti(JSON, JSONInvertito),
     open(FileName, write, Out),
+    put(Out, '\''),
     write(Out, JSONInvertito),
+    put(Out, '\''),
     put(Out, '.'),
     nl(Out),
     close(Out).
@@ -260,10 +285,25 @@ jsondump(JSON, FileName) :-
 
 jsonread(FileName, JSON) :-
     open(FileName, read, In),
-    read(In, ContenutoFile),
+    read(In, AtomLetto),
     close(In),
-    term_to_atom(ContenutoFile, ContenutoAtomizzato),
-    jsonparse(ContenutoAtomizzato, JSON).
+    atom_chars(AtomLetto, Lista),
+    arricchisci_stringa_slash(Lista, ListaArricchita),
+    atomic_list_concat(ListaArricchita, AtomoJSON),
+    jsonparse(AtomoJSON, JSON).
+
+
+%%% arricchisci_stringa_slash/2 è un predicato di supporto
+
+arricchisci_stringa_slash([], []).
+
+arricchisci_stringa_slash([Carattere1 | AltriCaratteri], [Carattere1 | Altro]) :-
+    is_backslash(Carattere1),
+    !,
+    arricchisci_stringa_slash(AltriCaratteri, Altro).
+
+arricchisci_stringa_slash([Carattere1 | AltriCaratteri], [Carattere1 | Risultato]) :-
+    arricchisci_stringa_slash(AltriCaratteri, Risultato).
 
 %%%% ---- fine LETTURA JSON DA FILE ----
 
@@ -282,6 +322,12 @@ parser_string([Virgolette | AltriCaratteri], Stringa, Resto) :-
 leggi_stringa([Virgolette | Resto], [], Resto) :-
     is_virgolette(Virgolette),
     !.
+
+leggi_stringa([BackSlash, Carattere | Altro], [Carattere | LettiPrecedentemente], Resto) :-
+    is_backslash(BackSlash),
+    !,
+    char_type(Carattere, ascii),
+    leggi_stringa(Altro, LettiPrecedentemente, Resto).
 
 leggi_stringa([Carattere | Altro], [Carattere | LettiPrecedentemente], Resto) :-
     char_type(Carattere, ascii),
