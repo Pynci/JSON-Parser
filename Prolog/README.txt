@@ -19,7 +19,7 @@ In particolare occorre sapere che:
 	NEL FILE:	'{"citazione":"\\"hello there\\""}'.
 
 Senza “atomizzare” il contenuto del file non risultava possibile distinguere e
-riconoscere in maniera corretta le virgolette interne da quelle che delimitano la
-stringa, dal momento che SWI-Prolog e alcuni predicati di sistema
+riconoscere in maniera corretta le virgolette interne da quelle che delimitano
+la stringa, dal momento che SWI-Prolog e alcuni predicati di sistema
 (come atomic_list_concat) manipolano le virgolette e i backslash in maniera
 automatica, senza permettere di gestire i vari casi singolarmente.

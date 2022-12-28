@@ -10,7 +10,7 @@
 
 
 
-% predicati is
+% predicati base per il riconoscimento dei caratteri
 is_virgolette('\"').
 is_backslash('\\').
 is_meno('-').
@@ -40,7 +40,7 @@ is_double_point(':').
 % riceve in input un atomo contenente JSON (StringaJSON) e una struttura da 
 % riconoscere in Oggetto.
 % Se Oggetto non è istanziato, il predicato risponde riconoscendo
-% la prima struttura che incontra
+% la prima struttura che incontra.
 
 % se in input arriva un atomo allora per prima cosa viene trasformato in una
 % lista di caratteri
@@ -115,6 +115,12 @@ parser_value(Null, Valore, Resto) :-
 
 %%%% ---- inizio ACCESSO JSON ----
 
+%%% jsonaccess/3
+% consulta la struttura composta creata da jsonparse/2 e risponde true se
+% è in grado di trovare il dato specificato da Risultato percorrendo la
+% struttura secondo quanto indicato dalla lista dei campi (passata come
+% secondo argomento)
+
 jsonaccess(jsonobj(X), [], jsonobj(X)).
 
 jsonaccess(jsonobj([','(Stringa, Risultato) | _]), [Stringa], Risultato) :- !.
@@ -166,7 +172,9 @@ jsonaccess(jsonobj(X), Stringa, Risultato) :-
 
 %%%% ---- inizio STAMPA JSON SU FILE ----
 
-%%% Inizio implementazione inverti/2
+%%% inverti/2
+% è un predicato di supporto che serve ricavare i dati dagli oggetti JSON per
+% comporre una stringa scritta in standard JSON (pronta da stampare su file)
 
 inverti(Stringa, StringaFinale) :-
     string(Stringa),
@@ -251,9 +259,12 @@ inverti(jsonarray([Valore | Altro]), Risultato) :-
     atomic_list_concat(['[', '"', Valore, '"', ',', AtomoCaratteriRimanenti], Risultato).
 
 
-%%% Fine implementazione inverti/2
-
-%%% arricchisci_stringa/2 è un predicato di supporto
+%%% arricchisci_stringa/2
+% è un predicato di supporto necessario per poter gestire correttamente il caso
+% in cui si presentino delle virgolette interne ad una stringa.
+% Aggiunge i backslash necessari a distinguere le virgolette interne da quelle
+% che delimitano la stringa per permettere al predicato inverti/2 di gestirle
+% in maniera adeguata.
 
 arricchisci_stringa([], []).
 
@@ -265,7 +276,11 @@ arricchisci_stringa([Carattere1 | AltriCaratteri], ['\\', '\\', Carattere1 | Alt
 arricchisci_stringa([Carattere1 | AltriCaratteri], [Carattere1 | Risultato]) :-
     arricchisci_stringa(AltriCaratteri, Risultato).
 
-%%% jsondump/2 consente di stampare JSON su file
+
+%%% jsondump/2
+% è un predicato che consente di stampare il contenuto di un oggetto JSON
+% su file (trasformandolo in standard JSON).
+% Per chiarimenti su questa parte si veda il file README.txt allegato.
 
 jsondump(JSON, FileName) :-
     inverti(JSON, JSONInvertito),
@@ -283,6 +298,9 @@ jsondump(JSON, FileName) :-
 
 %%%% ---- inizio LETTURA JSON DA FILE ----
 
+%%% jsonread/2
+% è un predicato che consente di leggere quanto stampato da jsondump/2 su file.
+
 jsonread(FileName, JSON) :-
     open(FileName, read, In),
     read(In, AtomLetto),
@@ -293,7 +311,10 @@ jsonread(FileName, JSON) :-
     jsonparse(AtomoJSON, JSON).
 
 
-%%% arricchisci_stringa_slash/2 è un predicato di supporto
+%%% arricchisci_stringa_slash/2
+% è un predicato di supporto che consente a jsonread/2 di distinguere le
+% virgolette interne alla stringa da quelle che la delimitano, così che
+% possa gestirle in maniera coerente.
 
 arricchisci_stringa_slash([], []).
 
@@ -311,13 +332,20 @@ arricchisci_stringa_slash([Carattere1 | AltriCaratteri], [Carattere1 | Risultato
 
 %%%% ---- inizio PARSING STRINGHE ----
 
+%%% parser_string/3
+% è un predicato che consente di riconoscere una stringa a partire da una
+% sequenza di caratteri
+
 parser_string([Virgolette | AltriCaratteri], Stringa, Resto) :-
     is_virgolette(Virgolette),
     leggi_stringa(AltriCaratteri, Letta, Resto),
     atomic_list_concat(Letta, AtomoStringa),
     atom_string(AtomoStringa, Stringa).
 
-%%% leggi_stringa/3 serve a leggere i caratteri e le virgolette di chiusura
+%%% leggi_stringa/3
+% è un predicato di supporto che permette a parser_string/3 di individuare
+% i caratteri appartenenti alla stringa e le virgolette che indicano la fine
+% della stringa stessa.
 
 leggi_stringa([Virgolette | Resto], [], Resto) :-
     is_virgolette(Virgolette),
@@ -339,7 +367,11 @@ leggi_stringa([Carattere | Altro], [Carattere | LettiPrecedentemente], Resto) :-
 
 %%%% ---- inizio PARSING NUMERI ----
 
-%%% parser del numero naturale.
+%%% parser_n/3
+% è un predicato che consente di riconoscere un numero naturale a partire
+% da una sequenza di caratteri.
+% L'implementazione è tratta da quella presentata all'interno delle slide
+% del corso.
 
 parse_n(Chars, I , MoreChars) :-
     parse_n(Chars, [], I, _, MoreChars).
@@ -360,7 +392,9 @@ parse_n([], DsR, I, Digits, []) :-
     number_string(I, Digits).
 
 
-%%% parser del numero intero (anche negativo)
+%%% parser_z/3
+% è un predicato che consente di riconoscere un numero intero (negativo) a
+% partire da una sequenza di caratteri.
 
 parser_z(Caratteri, NumeroOttenuto, CaratteriRestanti) :-
     parser_z(Caratteri, [], NumeroOttenuto, _CifreDelNumero, CaratteriRestanti).
@@ -387,7 +421,9 @@ parser_z([], CifreLette, NumeroOttenuto, CifreDelNumero, []) :-
     number_string(NumeroOttenuto, CifreDelNumero).
 
 
-%%% Parser numeri razionali
+%%% parser_q/3
+% è un predicato che consente di riconoscere un numero razionale (composto da
+% una parte intera e una parte decimale) a partire da una sequenza di caratteri
 
 parser_q(Sequenza, NumeroOttenuto, CaratteriRimanenti) :-
     parser_q(Sequenza, [], NumeroOttenuto, _SequenzaLetta, CaratteriRimanenti).
@@ -413,6 +449,12 @@ parser_decimale([], [], []).
 
 %%%% ---- inizio PARSING OGGETTO ----
 
+%%% parser_object/3
+% è un predicato che consente di riconoscere la struttura complessa di un
+% object in JSON a partire da una sequenza di caratteri.
+% Il predicato inoltre costruisce una struttura prolog composta che permette di
+% immagazzinare al suo interno i dati che caratterizzano l'object riconosciuto.
+
 parser_object([Graffa | Sequenza], jsonobj(), Resto) :-
     is_aperta_graffa(Graffa),
     trim_testa(Sequenza, GraffaAltro),
@@ -423,6 +465,11 @@ parser_object([Graffa | Sequenza], jsonobj(Coppie), Resto) :-
     is_aperta_graffa(Graffa),
     trim_testa(Sequenza, SequenzaSenzaSpazi),
     leggi_coppie(SequenzaSenzaSpazi, Coppie, Resto).
+
+%%% leggi_coppie/3
+% è un predicato di supporto che consente a parser_object/3 di individuare
+% tutte le coppie chiave:valore che fanno parte dell'object JSON.
+% Individua inoltre la parentesi graffa che decreta la fine dell'object JSON.
 
 leggi_coppie(Sequenza, [','(Chiave, ValoreLetto) | CoppieLette], Resto) :-
     parser_string(Sequenza, Chiave, Altro),
@@ -451,6 +498,12 @@ leggi_coppie(Sequenza, [','(Chiave, ValoreLetto)], Resto) :-
 
 %%%% ---- inizio PARSING ARRAY ----
 
+%%% parser_array/3
+% è un predicato che consente di riconoscere la struttura complessa di un
+% array in JSON a partire da una sequenza di caratteri.
+% Il predicato inoltre si occupa di costruire una struttura prolog composta in
+% grado di immagazzinare la lista di elementi che caratterizzano l'array JSON.
+
 parser_array([ApertaQuadra | SpaziAltro], jsonarray([]), Resto) :-
     is_quadra_aperta(ApertaQuadra),
     trim_testa(SpaziAltro, Altro),
@@ -462,8 +515,11 @@ parser_array([ApertaQuadra | Altro], jsonarray(ListaElementi), Resto) :-
     is_quadra_aperta(ApertaQuadra),
     leggi_elementi(Altro, ListaElementi, Resto).
 
-% Legge un valore se poi trova la virgola allora deve richiamare
-% il predicato ricorsivamente.
+%%% leggi_elementi/3
+% è un predicato di supporto che permette a parser_array/3 di individuare
+% tutti gli elementi facenti parte dell'array JSON.
+% Individua inoltre la partentesi quadra che decreta la fine dell'array JSON.
+
 leggi_elementi(ListaCaratteri, [ValoreTrovato | ValoriLetti], Resto) :-
     parser_value(ListaCaratteri, ValoreTrovato, AltriCaratteri),
     nth0(0, AltriCaratteri, Virgola, AltroValore),
@@ -471,8 +527,6 @@ leggi_elementi(ListaCaratteri, [ValoreTrovato | ValoriLetti], Resto) :-
     leggi_elementi(AltroValore, ValoriLetti, Resto),
     !.
 
-% Legge un valore se poi trova la parentesi quadra chiusa allora
-% si ferma.
 leggi_elementi(ListaCaratteri, [ValoreTrovato], Resto) :-
     parser_value(ListaCaratteri, ValoreTrovato, AltriCaratteri),
     nth0(0, AltriCaratteri, QuadraChiusa, Resto),
@@ -483,6 +537,10 @@ leggi_elementi(ListaCaratteri, [ValoreTrovato], Resto) :-
 
 
 %%%% ---- inizio PARSING TRUE ----
+
+%%% parser_true/3
+% è un predicato che permette di riconoscere il booleano true a partire da una
+% sequenza di caratteri.
 
 parser_true([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
             True, Resto) :-
@@ -497,6 +555,10 @@ parser_true([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
 
 
 %%%% ---- inizio PARSING FALSE ----
+
+%%% parser_false/3
+% è un predicato che permette di riconoscere il booleano false a partire da una
+% sequenza di caratteri.
 
 parser_false([Carattere1, Carattere2, Carattere3, Carattere4, Carattere5
             | Resto], False, Resto) :-
@@ -514,6 +576,10 @@ parser_false([Carattere1, Carattere2, Carattere3, Carattere4, Carattere5
 
 %%%% ---- inizio PARSING NULL ----
 
+%%% parser_null/3
+% è un predicato che permette di riconoscere il tipo di dato null a partire 
+% da una sequenza di caratteri.
+
 parser_null([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
             Null, Resto) :-
     is_n(Carattere1),
@@ -528,6 +594,11 @@ parser_null([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
 
 %%%% ---- inizio libreria TRIM ----
 
+%%% trim/2
+% è un predicato in grado di rimuovere gli spazi durante la procedura di
+% parsing: in questo modo l'utente può inserire un numero indefinito di
+% caratteri di spaziatura senza intaccare il funzionamento di jsonparse/2
+
 trim(Atomo, ListaTrimmata) :-
     atom(Atomo),
     !,
@@ -541,34 +612,35 @@ trim(Lista, ListaTrimmata) :-
     trim(AtomoLista, ListaTrimmata).
 
 
-%%% trim_testa/2 rimuove le spaziature superflue in testa
+%%% trim_testa/2
+% è un predicato di supporto che consente a trim/2 di rimuovere le spaziature
+% poteste in testa ad una lista di caratteri
 
-%%% se non ho caratteri il gioco finisce subito
 trim_testa([], []).
 
-%%% se il primo carattere non è di spaziatura sono a posto
 trim_testa([Carattere | Altro], [Carattere | Altro]) :-
     not(char_type(Carattere, space)),
     !.
 
-%%% caso base: non ci sono caratteri alfanumerici
 trim_testa([Spazio | []], []) :-
     char_type(Spazio, space),
     !.
 
-%%% caso base: solo il primo primo carattere è di spaziatura
 trim_testa([Spazio, Carattere | Altro], [Carattere | Altro]) :-
     char_type(Spazio, space),
     not(char_type(Carattere, space)),
     !.
 
-%%% se il primo carattere è di spaziatura lo scarto
 trim_testa([Spazio | Altro], NuovaLista) :-
     char_type(Spazio, space),
     !,
     trim_testa(Altro, NuovaLista).
 
-%%% trim_coda/2 rimuove le spaziature superflue in coda
+%%% trim_coda/2
+% è un predicato di supporto che sfrutta trim_testa/2 per rimuovere le
+% spaziature poste in coda ad una lista di caratteri.
+% NB: si fa uso del predicato di sistema reverse/2 per invertire la lista.
+
 trim_coda(ListaDaTrimmare, ListaTrimmata) :-
     reverse(ListaDaTrimmare, ListaRibaltata),
     !,
