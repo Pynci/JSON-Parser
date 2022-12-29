@@ -201,7 +201,7 @@ inverti(False, False) :-
     !.
 
 inverti(jsonobj([]), Risultato) :-
-    atomic_list_concat(['{', '}'], Risultato),
+    atomic_list_concat(['{', ' ', '}'], Risultato),
     !.
 
 inverti(jsonobj([','(Chiave, Valore)]), Risultato) :-
@@ -211,7 +211,7 @@ inverti(jsonobj([','(Chiave, Valore)]), Risultato) :-
     atom_chars(AtomoChiave, ListaArricchitaChiave),
     inverti(Valore, ValoreInvertito),
     !,
-    atomic_list_concat(['{', '"', AtomoChiave, '"', ':', ValoreInvertito,'}'], Risultato).
+    atomic_list_concat(['{', ' ', '"', AtomoChiave, '"', ' ', ':', ' ', ValoreInvertito, ' ', '}'], Risultato).
 
 inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
     string(Chiave),
@@ -224,7 +224,7 @@ inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
     atom_chars(Risultato1, ListaCaratteriRisultato),
     nth0(0, ListaCaratteriRisultato, _Graffa, CaratteriRimanenti),
     atom_chars(AtomoCaratteriRimanenti, CaratteriRimanenti),
-    atomic_list_concat(['{', '"', AtomoChiave, '"', ':', ValoreInvertito, ',', AtomoCaratteriRimanenti], Risultato).
+    atomic_list_concat(['{', ' ', '"', AtomoChiave, '"', ' ', ':', ' ', ValoreInvertito, ',', AtomoCaratteriRimanenti], Risultato).
 
 inverti(jsonarray([]), Risultato) :-
     atomic_list_concat(['[', ']'], Risultato),
@@ -247,7 +247,7 @@ inverti(jsonarray([Valore | Altro]), Risultato) :-
     atom_chars(Risultato1, ListaCaratteriRisultato),
     nth0(0, ListaCaratteriRisultato, _Quadra, CaratteriRimanenti),
     atom_chars(AtomoCaratteriRimanenti, CaratteriRimanenti),
-    atomic_list_concat(['[', ValoreInvertito, ',', AtomoCaratteriRimanenti], Risultato).
+    atomic_list_concat(['[', ValoreInvertito, ',', ' ', AtomoCaratteriRimanenti], Risultato).
 
 inverti(jsonarray([Valore | Altro]), Risultato) :-
     string(Valore),
@@ -256,7 +256,7 @@ inverti(jsonarray([Valore | Altro]), Risultato) :-
     atom_chars(Risultato1, ListaCaratteriRisultato),
     nth0(0, ListaCaratteriRisultato, _Quadra, CaratteriRimanenti),
     atom_chars(AtomoCaratteriRimanenti, CaratteriRimanenti),
-    atomic_list_concat(['[', '"', Valore, '"', ',', AtomoCaratteriRimanenti], Risultato).
+    atomic_list_concat(['[', '"', Valore, '"', ',', ' ', AtomoCaratteriRimanenti], Risultato).
 
 
 %%% arricchisci_stringa/2
