@@ -6,9 +6,12 @@
 
 (defun value-parser (sdp)
   (cond ((zerop (length sdp)) (print "Non esiste nulla da analizzare."))
+        ((equal (subseq sdp 0 1) "[")
+          (let ((array-letto (cons 'JSONARRAY (leggi-array (subseq sdp 1)))))
+            array-letto))
         ((equal (subseq sdp 0 1) "\"") 
           (let ((sl (concatenate 'string "\"" (leggi-stringa (subseq sdp 1)))))
-           (cons sl (subseq sdp (length sl)))))
+            (cons sl (subseq sdp (length sl)))))
         ((numberp (digit-char-p (char sdp 0))) 
           (let ((numlet (leggi-numero sdp)))
             (cons (parse-float numlet) (subseq sdp (length numlet)))))
@@ -53,6 +56,21 @@
               (concatenate 'string pe (leggi-numero (subseq stringa 1 (length stringa)))))
           (concatenate 'string pe (leggi-numero (subseq stringa 1 (length stringa))))))))
 
-
 ;;; Fine funzione leggi-numero
 
+;;; Funzione leggi-array
+
+(defun leggi-array (stringa)
+  (if (zerop (length stringa))
+      ""
+      (let ((pe (subseq stringa 0 1)))
+        (cond
+          ((equal pe "]") NIL)
+          ((equal pe ",")
+            (let ((elementi-restanti (value-parser (subseq stringa 1 (length stringa)))))
+              (cons (first elementi-restanti) (leggi-array (rest elementi-restanti)))))
+          (T
+            (cons (first (value-parser stringa)) (leggi-array (rest (value-parser stringa)))))))))
+
+
+;(cons (first (value-parser (subseq 1 (length stringa)))) (leggi-array (rest (value-parser stringa))))
