@@ -268,7 +268,7 @@ inverti(jsonarray([Valore | Altro]), Risultato) :-
 
 arricchisci_stringa([], []).
 
-arricchisci_stringa([Carattere1 | AltriCaratteri], ['\\', '\\', Carattere1 | Altro]) :-
+arricchisci_stringa([Carattere1 | AltriCaratteri], ['\\', Carattere1 | Altro]) :-
     is_virgolette(Carattere1),
     !,
     arricchisci_stringa(AltriCaratteri, Altro).
@@ -285,10 +285,10 @@ arricchisci_stringa([Carattere1 | AltriCaratteri], [Carattere1 | Risultato]) :-
 jsondump(JSON, FileName) :-
     inverti(JSON, JSONInvertito),
     open(FileName, write, Out),
-    put(Out, '\''),
+    %put(Out, '\''),
     write(Out, JSONInvertito),
-    put(Out, '\''),
-    put(Out, '.'),
+    %put(Out, '\''),
+    %put(Out, '.'),
     nl(Out),
     close(Out).
 
@@ -302,10 +302,12 @@ jsondump(JSON, FileName) :-
 % è un predicato che consente di leggere quanto stampato da jsondump/2 su file.
 
 jsonread(FileName, JSON) :-
-    open(FileName, read, In),
-    read(In, AtomLetto),
-    close(In),
-    atom_chars(AtomLetto, Lista),
+    %open(FileName, read, In),
+    %read(In, AtomLetto),
+    %close(In),
+    read_file_to_string(FileName, Stringa, []),
+    atom_string(Atomo, Stringa),
+    atom_chars(Atomo, Lista),
     arricchisci_stringa_slash(Lista, ListaArricchita),
     atomic_list_concat(ListaArricchita, AtomoJSON),
     jsonparse(AtomoJSON, JSON).
