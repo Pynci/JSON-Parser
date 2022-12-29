@@ -21,6 +21,8 @@
          (cons "true" (subseq sdp 4)))
         ((equal (subseq sdp 0 5) "false") 
          (cons "false" (subseq sdp 5)))
+        (T
+         (error "Input non valido"))
         ))
 ;;; Fine funzione value-parser
 
@@ -38,14 +40,22 @@
 ;pe = primo elemento
 
 (defun leggi-numero (stringa)
+  (if (zerop (length stringa))
+    ""
+    (let ((pe (subseq stringa 0 1)))
+      (if (not (numberp (digit-char-p (char pe 0))))
+          (if (not(equal pe "."))
+              ""
+              (concatenate 'string pe (leggi-numero (subseq stringa 1 (length stringa)))))
+          (concatenate 'string pe (leggi-numero (subseq stringa 1 (length stringa))))))))
+
+
+#|
+(defun leggi-numero (stringa)
   (let ((pe (subseq stringa 0 1)))
-    (if (not (numberp (digit-char-p (char pe 0))))
-        (if (not(equal pe "."))
-            ""
-            (concatenate 'string pe (leggi-numero (subseq stringa 1 (length stringa)))))
-        (concatenate 'string pe (leggi-numero (subseq stringa 1 (length stringa)))))))
+    (if (equal pe ".")
+      )))
+|#
 
 ;;; Fine funzione leggi-numero
-
-
 
