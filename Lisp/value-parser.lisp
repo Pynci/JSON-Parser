@@ -4,8 +4,9 @@
 ; sl = stringa letta
 ;numlet = numero letto
 
-(defun value-parser (sdp)
-  (cond ((zerop (length sdp)) (print "Non esiste nulla da analizzare."))
+(defun value-parser (stringa-non-trimmata)
+  (let ((sdp (string-trim-whitespace stringa-non-trimmata)))
+    (cond ((zerop (length sdp)) (print "Non esiste nulla da analizzare."))
         ((equal (subseq sdp 0 1) "[")
           (let ((array-letto (cons 'JSONARRAY (leggi-array (subseq sdp 1)))))
             (cons (butlast array-letto) (last array-letto))))
@@ -30,7 +31,7 @@
               (error "Input non valido"))))
         (T
           (error "Input non valido"))
-        ))
+        )))
 ;;; Fine funzione value-parser
 
 ;;; Funzione leggi-stringa
@@ -77,8 +78,9 @@ Se qualcosa non ti torna scrivimi e fammelo sapere! :D
 
 ~Pynci
  |#
-(defun leggi-array (stringa)
-  (if (zerop (length stringa))
+(defun leggi-array (stringa-ricevuta)
+  (let ((stringa (string-trim-whitespace stringa-ricevuta)))
+    (if (zerop (length stringa))
       ""
       (let ((pe (subseq stringa 0 1)))
         (cond
@@ -92,7 +94,7 @@ Se qualcosa non ti torna scrivimi e fammelo sapere! :D
             (let ((primo-valore (value-parser stringa)))
               (cond ((listp (car primo-valore)) 
                       (cons (car primo-valore) (leggi-array (car (cdr primo-valore)))))
-                    (t (cons (car primo-valore) (leggi-array (cdr primo-valore)))))) )))))
+                    (t (cons (car primo-valore) (leggi-array (cdr primo-valore))))))))))))
 
 
-;(cons (first (value-parser stringa)) (leggi-array (rest (value-parser stringa))))
+;[1,2, 3] [1,2] resto , 3
