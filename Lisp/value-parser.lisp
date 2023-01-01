@@ -7,8 +7,11 @@
 (defun value-parser (stringa-non-trimmata)
   (let ((sdp (string-trim-whitespace stringa-non-trimmata)))
     (cond ((zerop (length sdp)) (print "Non esiste nulla da analizzare."))
+        ((equal (subseq sdp 0 1) "{")
+          (let ((oggetto-letto (cons 'jsonobj (leggi-oggetto (subseq sdp 1)))))
+            (cons (butlast oggetto-letto) (last oggetto-letto))))
         ((equal (subseq sdp 0 1) "[")
-          (let ((array-letto (cons 'JSONARRAY (leggi-array (subseq sdp 1)))))
+          (let ((array-letto (cons 'jsonarray (leggi-array (subseq sdp 1)))))
             (cons (butlast array-letto) (last array-letto))))
         ((equal (subseq sdp 0 1) "\"") 
           (let ((sl (concatenate 'string "\"" (leggi-stringa (subseq sdp 1)))))
@@ -64,13 +67,13 @@
 (defun leggi-array (stringa-ricevuta)
   (let ((stringa (string-trim-whitespace stringa-ricevuta)))
     (if (zerop (length stringa))
-      ""
+      (error "leggi-array: hai fatto una cacata")
       (let ((pe (subseq stringa 0 1)))
         (cond
           ((equal pe "]") (cons (subseq stringa 1 (length stringa)) NIL))
           ((equal pe ",")
             (let ((elementi-restanti (value-parser (subseq stringa 1 (length stringa)))))
-              (cond ((listp (car elementi-restanti)) 
+              (cond ((listp (car elementi-restanti))
                       (cons (first elementi-restanti) (leggi-array (car (cdr elementi-restanti)))))
                     (t (cons (first elementi-restanti) (leggi-array (rest elementi-restanti)))))))
           (T
@@ -85,6 +88,15 @@
 
 (defun leggi-oggetto (stringa-ricevuta)
   (let ((stringa (string-trim-whitespace stringa-ricevuta)))
-    ))
+    (if (zerop (length stringa))
+        (error "leggi-oggetto: hai fatto una cacata")
+        (let ((pe (subseq stringa 0 1)))
+          (cond 
+            ((equal pe "}") (cons (subseq stringa 1 (length stringa)) NIL))
+            ((equal pe "\"")
+              ;continua qui
+              ))))))
 
-;;; Fine funzione leggi-oggetto
+;;; Fine funzione leggi-oggetto 
+
+; ((JSONARRAY 1 2 3) ",[4,5]]")
