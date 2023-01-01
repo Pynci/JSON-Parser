@@ -37,7 +37,7 @@
         )))
 ;;; Fine funzione value-parser
 
-;;; Funzione leggi-stringa
+;;; Funzione parser-stringa
 
 (defun leggi-stringa (stringa)
   (if (equal (subseq stringa 0 1) "\"")
@@ -91,12 +91,13 @@
     (if (zerop (length stringa))
         (error "leggi-oggetto: hai fatto una cacata")
         (let ((pe (subseq stringa 0 1)))
-          (cond 
-            ((equal pe "}") (cons (subseq stringa 1 (length stringa)) NIL))
-            ((equal pe "\"")
-              ;continua qui
-              ))))))
+          (if (equal pe "}")
+              (cons (subseq stringa 1 (length stringa)) NIL)
+              leggi-coppia(stringa))))))
 
+(defun leggi-coppia (stringa-ricevuta)
+  ; continua qui, me so cacato er cazzo dato che sono le 19:30
+  )
 ;;; Fine funzione leggi-oggetto 
 
 ; ((JSONARRAY 1 2 3) ",[4,5]]")
