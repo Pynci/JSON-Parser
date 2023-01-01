@@ -85,6 +85,14 @@ Se qualcosa non ti torna scrivimi e fammelo sapere! :D
           ((equal pe "]") (cons (subseq stringa 1 (length stringa)) NIL))
           ((equal pe ",")
             (let ((elementi-restanti (value-parser (subseq stringa 1 (length stringa)))))
-              (cons (first elementi-restanti) (leggi-array (rest elementi-restanti)))))
+              (cond ((listp (car elementi-restanti)) 
+                      (cons (first elementi-restanti) (leggi-array (car (cdr elementi-restanti)))))
+                    (t (cons (first elementi-restanti) (leggi-array (rest elementi-restanti)))))))
           (T
-            (cons (first (value-parser stringa)) (leggi-array (rest (value-parser stringa)))))))))
+            (let ((primo-valore (value-parser stringa)))
+              (cond ((listp (car primo-valore)) 
+                      (cons (car primo-valore) (leggi-array (car (cdr primo-valore)))))
+                    (t (cons (car primo-valore) (leggi-array (cdr primo-valore)))))) )))))
+
+
+;(cons (first (value-parser stringa)) (leggi-array (rest (value-parser stringa))))
