@@ -227,18 +227,18 @@ inverti(jsonobj([','(Chiave, Valore) | Altro]), Risultato) :-
     atomic_list_concat(['{', ' ', '"', AtomoChiave, '"', ' ', ':', ' ', ValoreInvertito, ',', AtomoCaratteriRimanenti], Risultato).
 
 inverti(jsonarray([]), Risultato) :-
-    atomic_list_concat(['[', ']'], Risultato),
+    atomic_list_concat(['[', ' ', ']'], Risultato),
     !.
 
 inverti(jsonarray([Valore]), Risultato) :-
     inverti(Valore, ValoreInvertito),
     !,
-    atomic_list_concat(['[',ValoreInvertito,']'], Risultato).
+    atomic_list_concat(['[', ValoreInvertito, ']'], Risultato).
 
 inverti(jsonarray([Valore]), Risultato) :-
     string(Valore),
     !,
-    atomic_list_concat(['[','"', Valore, '"', ']'], Risultato).
+    atomic_list_concat(['[', '"', Valore, '"', ']'], Risultato).
 
 inverti(jsonarray([Valore | Altro]), Risultato) :-
     inverti(Valore, ValoreInvertito),
