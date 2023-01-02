@@ -73,20 +73,20 @@
 (defun leggi-array (stringa-ricevuta)
   (let ((stringa (string-trim-whitespace stringa-ricevuta)))
     (if (zerop (length stringa))
-      (error "leggi-array: hai fatto una cacata")
+      (error "[jsonparse] jsonarray: syntax error (invalid array)")
       (let ((pe (primo-carattere stringa)))
         (cond
           ((equal pe "]") (cons (subseq stringa 1) NIL))
           ((equal pe ",")
             (let ((elementi-restanti (parser-value (subseq stringa 1))))
-              (cond ((listp (car elementi-restanti))
-                      (cons (first elementi-restanti) (leggi-array (car (cdr elementi-restanti)))))
-                    (t (cons (first elementi-restanti) (leggi-array (rest elementi-restanti)))))))
+              (if (listp (car elementi-restanti))
+                (cons (car elementi-restanti) (leggi-array (car (cdr elementi-restanti))))
+                (cons (car elementi-restanti) (leggi-array (cdr elementi-restanti))))))
           (T
             (let ((primo-valore (parser-value stringa)))
-              (cond ((listp (car primo-valore)) 
-                      (cons (car primo-valore) (leggi-array (car (cdr primo-valore)))))
-                    (t (cons (car primo-valore) (leggi-array (cdr primo-valore))))))))))))
+              (if (listp (car primo-valore))
+                (cons (car primo-valore) (leggi-array (car (cdr primo-valore))))
+                (cons (car primo-valore) (leggi-array (cdr primo-valore)))))))))))
 
 ;;; Fine funzione leggi-array
 
@@ -96,7 +96,7 @@
 (defun leggi-oggetto (stringa-ricevuta)
   (let ((stringa (string-trim-whitespace stringa-ricevuta)))
     (if (zerop (length stringa))
-        (error "jsonparse: syntax error (invalid object)")
+        (error "[jsonparse] jsonobj: syntax error (invalid object)")
         (let ((pe (primo-carattere stringa)))
           (cond 
             ((equal pe "}") 
@@ -118,6 +118,7 @@
               (if (listp (car valore))
                 (cons (cons chiave (cons (car valore) NIL)) (car (cdr valore)))
                 (cons (cons chiave (cons (car valore) NIL)) (cdr valore))))
-            (error "jsonparse: syntax error (missing ':')"))))
-      (error "jsonparse: syntax error (key is not a string)"))))
+            (error "[jsonparse] jsonobj: syntax error (missing ':')"))))
+      (error "[jsonparse] jsonobj: syntax error (key is not a string)"))))
 ;;; Fine funzione leggi-oggetto 
+
