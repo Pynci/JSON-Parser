@@ -92,6 +92,7 @@
 
 ;;; Funzione leggi-oggetto
 
+; REMINDER: sostituire i cond con if ove possibile
 (defun leggi-oggetto (stringa-ricevuta)
   (let ((stringa (string-trim-whitespace stringa-ricevuta)))
     (if (zerop (length stringa))
@@ -101,11 +102,11 @@
             ((equal pe "}") 
               (cons (subseq stringa 1) NIL))
             ((equal pe ",")
-              (let ((coppia (leggi-coppia (subseq stringa 1))))
-                (cons (car coppia) (leggi-oggetto (cdr coppia)))))
+              (let ((coppie-restanti (leggi-coppia (subseq stringa 1))))
+                (cons (car coppie-restanti) (leggi-oggetto (cdr coppie-restanti)))))
             (T
-              (let ((coppia (leggi-coppia stringa)))
-                (cons (car coppia) (leggi-oggetto (cdr coppia))))))))))
+              (let ((prima-coppia (leggi-coppia stringa)))
+                (cons (car prima-coppia) (leggi-oggetto (cdr prima-coppia))))))))))
 
 (defun leggi-coppia (stringa-ricevuta)
   (let ((stringa (string-trim-whitespace stringa-ricevuta)))
@@ -114,11 +115,9 @@
         (let ((resto (string-trim-whitespace (subseq stringa (length chiave) (length stringa)))))
           (if (equal (primo-carattere resto) ":")
             (let ((valore (parser-value (string-trim-whitespace (subseq resto 1)))))
-              (cons (cons chiave (cons (car valore) NIL)) (cdr valore)))
+              (if (listp (car valore))
+                (cons (cons chiave (cons (car valore) NIL)) (car (cdr valore)))
+                (cons (cons chiave (cons (car valore) NIL)) (cdr valore))))
             (error "jsonparse: syntax error (missing ':')"))))
       (error "jsonparse: syntax error (key is not a string)"))))
 ;;; Fine funzione leggi-oggetto 
-
-; ((JSONARRAY 1 2 3) ",[4,5]]")
-
-; (cons (butlast oggetto-letto) (last oggetto-letto))
