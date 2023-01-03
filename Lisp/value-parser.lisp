@@ -10,7 +10,7 @@
 
 (defun parser-value (stringa-non-trimmata)
   (let ((sdp (string-trim-whitespace stringa-non-trimmata)))
-    (cond ((zerop (length sdp)) (print "Non esiste nulla da analizzare."))
+    (cond ((zerop (length sdp)) (error "[jsonparse] syntax error (empty input)"))
         ((equal (primo-carattere sdp) "{")
           (let ((oggetto-letto (cons 'jsonobj (leggi-oggetto (subseq sdp 1)))))
             (cons (butlast oggetto-letto) (last oggetto-letto))))
@@ -22,10 +22,14 @@
             (cons sl (subseq sdp (length sl)))))
         ((numberp (digit-char-p (char sdp 0))) 
           (let ((numlet (leggi-numero sdp)))
-            (cons (parse-float numlet) (subseq sdp (length numlet)))))
+            (if (not (null (find #\. numlet)))
+                (cons (parse-float numlet) (subseq sdp (length numlet)))
+                (cons (parse-integer numlet) (subseq sdp (length numlet))))))
         ((equal (primo-carattere sdp) "-") 
           (let ((numlet (concatenate 'string "-" (leggi-numero (subseq sdp 1)))))
-           (cons (parse-float numlet) (subseq sdp (length numlet)))))
+            (if (not (null (find #\. numlet)))
+                (cons (parse-float numlet) (subseq sdp (length numlet)))
+                (cons (parse-integer numlet) (subseq sdp (length numlet))))))
         ((> (length sdp) 3)
           (cond
             ((equal (subseq sdp 0 4) "null") 
@@ -35,9 +39,9 @@
             ((equal (subseq sdp 0 5) "false") 
               (cons "false" (subseq sdp 5)))
             (T
-              (error "Input non valido"))))
+              (error "[jsonparse] syntax error (invalid input)"))))
         (T
-          (error "Input non valido"))
+          (error "[jsonparse] syntax error (invalid input)"))
         )))
 ;;; Fine funzione parser-value
 
@@ -68,8 +72,6 @@
 
 ;;; Funzione leggi-array
 
-
-;; REMINDER: rimanere coerenti con l'utilizzo di first/rest e di car/cdr
 (defun leggi-array (stringa-ricevuta)
   (let ((stringa (string-trim-whitespace stringa-ricevuta)))
     (if (zerop (length stringa))
@@ -92,7 +94,6 @@
 
 ;;; Funzione leggi-oggetto
 
-; REMINDER: sostituire i cond con if ove possibile
 (defun leggi-oggetto (stringa-ricevuta)
   (let ((stringa (string-trim-whitespace stringa-ricevuta)))
     (if (zerop (length stringa))
@@ -120,5 +121,6 @@
                 (cons (cons chiave (cons (car valore) NIL)) (cdr valore))))
             (error "[jsonparse] jsonobj: syntax error (missing ':')"))))
       (error "[jsonparse] jsonobj: syntax error (key is not a string)"))))
+
 ;;; Fine funzione leggi-oggetto 
 
