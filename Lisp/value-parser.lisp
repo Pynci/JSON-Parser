@@ -3,6 +3,26 @@
 (defun primo-carattere (stringa)
   (subseq stringa 0 1))
 
+(defun togli-virgolette (input)
+  (if (listp input)
+      (cond ((equal (first input) 'jsonarray) 
+              (cons 'jsonarray (scansiona-array (rest input))))
+            ((equal (first input) 'jsonobj)
+              (cons 'jsonobj (scansiona-oggetto (rest input)))))
+      (if (stringp input)
+          (subseq input 1 (- (length input) 1))
+          input)))
+
+(defun scansiona-array (array)
+  (if (= (length array) 1)
+      (cons (togli-virgolette (first array)) NIL)
+      (cons (togli-virgolette (first array)) (scansiona-array (rest array)))))
+
+(defun scansiona-oggetto (oggetto)
+  (if (= (length oggetto) 1)
+      (cons (cons (togli-virgolette (car (first oggetto))) (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) NIL)
+      (cons (cons (togli-virgolette (car (first oggetto))) (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) (scansiona-oggetto (rest oggetto)))))
+
 ;;; fine funzioni di supporto
 
 
@@ -10,10 +30,10 @@
   (let ((JSON (parser-value stringa-da-parsare)))
     (if (listp (car JSON))
         (if (equal (car (cdr JSON)) "")
-            (car JSON)
+            (togli-virgolette (car JSON))
             (error "[jsonparse] syntax error (invalid input)"))
         (if (equal (cdr JSON) "")
-            (car JSON)
+            (togli-virgolette (car JSON))
             (error "[jsonparse] syntax error (invalid input)")))))
 
 
@@ -49,11 +69,11 @@
         ((> (length sdp) 3)
           (cond
             ((equal (subseq sdp 0 4) "null") 
-              (cons "null" (subseq sdp 4)))
+              (cons 'null (subseq sdp 4)))
             ((equal (subseq sdp 0 4) "true") 
-              (cons "true" (subseq sdp 4)))
+              (cons 'true (subseq sdp 4)))
             ((equal (subseq sdp 0 5) "false") 
-              (cons "false" (subseq sdp 5)))
+              (cons 'false (subseq sdp 5)))
             (T
               (error "[jsonparse] syntax error (value not found)"))))
         (T
