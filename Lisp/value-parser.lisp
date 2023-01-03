@@ -1,6 +1,22 @@
+;;; Funzioni di supporto
 
 (defun primo-carattere (stringa)
   (subseq stringa 0 1))
+
+;;; fine funzioni di supporto
+
+
+(defun jsonparse (stringa-da-parsare)
+  (let ((JSON (parser-value stringa-da-parsare)))
+    (if (listp (car JSON))
+        (if (equal (car (cdr JSON)) "")
+            (car JSON)
+            (error "[jsonparse] syntax error (invalid input)"))
+        (if (equal (cdr JSON) "")
+            (car JSON)
+            (error "[jsonparse] syntax error (invalid input)")))))
+
+
 
 ;;; Funzione parser-value
 
@@ -39,9 +55,9 @@
             ((equal (subseq sdp 0 5) "false") 
               (cons "false" (subseq sdp 5)))
             (T
-              (error "[jsonparse] syntax error (invalid input)"))))
+              (error "[jsonparse] syntax error (value not found)"))))
         (T
-          (error "[jsonparse] syntax error (invalid input)"))
+          (error "[jsonparse] syntax error (value not found)"))
         )))
 ;;; Fine funzione parser-value
 
@@ -82,13 +98,13 @@
           ((equal pe ",")
             (let ((elementi-restanti (parser-value (subseq stringa 1))))
               (if (listp (car elementi-restanti))
-                (cons (car elementi-restanti) (leggi-array (car (cdr elementi-restanti))))
-                (cons (car elementi-restanti) (leggi-array (cdr elementi-restanti))))))
+                  (cons (car elementi-restanti) (leggi-array (car (cdr elementi-restanti))))
+                  (cons (car elementi-restanti) (leggi-array (cdr elementi-restanti))))))
           (T
             (let ((primo-valore (parser-value stringa)))
               (if (listp (car primo-valore))
-                (cons (car primo-valore) (leggi-array (car (cdr primo-valore))))
-                (cons (car primo-valore) (leggi-array (cdr primo-valore)))))))))))
+                  (cons (car primo-valore) (leggi-array (car (cdr primo-valore))))
+                  (cons (car primo-valore) (leggi-array (cdr primo-valore)))))))))))
 
 ;;; Fine funzione leggi-array
 
@@ -117,8 +133,8 @@
           (if (equal (primo-carattere resto) ":")
             (let ((valore (parser-value (string-trim-whitespace (subseq resto 1)))))
               (if (listp (car valore))
-                (cons (cons chiave (cons (car valore) NIL)) (car (cdr valore)))
-                (cons (cons chiave (cons (car valore) NIL)) (cdr valore))))
+                  (cons (cons chiave (cons (car valore) NIL)) (car (cdr valore)))
+                  (cons (cons chiave (cons (car valore) NIL)) (cdr valore))))
             (error "[jsonparse] jsonobj: syntax error (missing ':')"))))
       (error "[jsonparse] jsonobj: syntax error (key is not a string)"))))
 
