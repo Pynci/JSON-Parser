@@ -121,7 +121,25 @@ parser_value(Null, Valore, Resto) :-
 % struttura secondo quanto indicato dalla lista dei campi (passata come
 % secondo argomento)
 
-jsonaccess(jsonobj(X), [], jsonobj(X)).
+jsonaccess(jsonobj(X), [], jsonobj(X)) :- !.
+
+jsonaccess(jsonarray(X), [], jsonarray(X)) :- !.
+
+jsonaccess(jsonarray(X), Indice, Risultato) :-
+    number(Indice),
+    !,
+    nth0(Indice, X, Risultato).
+
+jsonaccess(jsonarray(X), [Indice], Risultato) :-
+    number(Indice),
+    !,
+    nth0(Indice, X, Risultato).
+
+jsonaccess(jsonarray(X), [Indice | Altro], Risultato) :-
+    number(Indice),
+    !,
+    nth0(Indice, X, Accesso),
+    jsonaccess(Accesso, Altro, Risultato).
 
 jsonaccess(jsonobj([','(Stringa, Risultato) | _]), [Stringa], Risultato) :- !.
 
@@ -163,22 +181,6 @@ jsonaccess(jsonobj(X), Stringa, Risultato) :-
     string(Stringa),
     jsonaccess(jsonobj(X), [Stringa], Risultato),
     !.
-
-jsonaccess(jsonarray(X), Indice, Risultato) :-
-    number(Indice),
-    !,
-    nth0(Indice, X, Risultato).
-
-jsonaccess(jsonarray(X), [Indice], Risultato) :-
-    number(Indice),
-    !,
-    nth0(Indice, X, Risultato).
-
-jsonaccess(jsonarray(X), [Indice | Altro], Risultato) :-
-    number(Indice),
-    !,
-    nth0(Indice, X, Accesso),
-    jsonaccess(Accesso, Altro, Risultato).
 
 %%%% ---- fine ACCESSO JSON ----
 
