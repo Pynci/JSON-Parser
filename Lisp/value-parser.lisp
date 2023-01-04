@@ -3,6 +3,13 @@
 (defun primo-carattere (stringa)
   (subseq stringa 0 1))
 
+(defun rimuovi-carattere (carattere stringa)
+  (cond ((equal stringa "") "")
+        ((equal (primo-carattere stringa) carattere)
+          (concatenate 'string "" (rimuovi-carattere carattere (subseq stringa 1))))
+        (T
+          (concatenate 'string (primo-carattere stringa) (rimuovi-carattere carattere (subseq stringa 1))))))
+
 (defun togli-virgolette (input)
   (if (listp input)
       (cond ((equal (first input) 'jsonarray) 
@@ -10,7 +17,7 @@
             ((equal (first input) 'jsonobj)
               (cons 'jsonobj (scansiona-oggetto (rest input)))))
       (if (stringp input)
-          (subseq input 1 (- (length input) 1))
+          (rimuovi-carattere "\\" (subseq input 1 (- (length input) 1)))
           input)))
 
 (defun scansiona-array (array)
