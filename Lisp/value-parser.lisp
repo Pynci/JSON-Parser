@@ -14,17 +14,21 @@
           input)))
 
 (defun scansiona-array (array)
-  (if (= (length array) 1)
-      (cons (togli-virgolette (first array)) NIL)
-      (cons (togli-virgolette (first array)) (scansiona-array (rest array)))))
+  (cond ((= (length array) 0) NIL)
+        ((= (length array) 1) (cons (togli-virgolette (first array)) NIL))
+        (T (cons (togli-virgolette (first array)) (scansiona-array (rest array))))))
 
 (defun scansiona-oggetto (oggetto)
-  (if (= (length oggetto) 1)
-      (cons (cons (togli-virgolette (car (first oggetto))) (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) NIL)
-      (cons (cons (togli-virgolette (car (first oggetto))) (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) (scansiona-oggetto (rest oggetto)))))
+  (cond ((= (length oggetto) 0) NIL)
+        ((= (length oggetto) 1)
+          (cons (cons (togli-virgolette (car (first oggetto))) (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) NIL))
+        (T
+          (cons (cons (togli-virgolette (car (first oggetto))) (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) (scansiona-oggetto (rest oggetto))))))
 
 ;;; fine funzioni di supporto
 
+
+;;; funzione jsonparse
 
 (defun jsonparse (stringa-da-parsare)
   (let ((JSON (parser-value stringa-da-parsare)))
@@ -36,13 +40,21 @@
             (togli-virgolette (car JSON))
             (error "[jsonparse] syntax error (invalid input)")))))
 
+;;; fine funzione jsonparse
+
+
+
+;;; funzione jsonaccess
+
+;;; fine funzione jsonaccess
+
 
 
 ;;; Funzione parser-value
 
 ; sdp = stringa da parsare
 ; sl = stringa letta
-;numlet = numero letto
+; numlet = numero letto
 
 (defun parser-value (stringa-non-trimmata)
   (let ((sdp (string-trim-whitespace stringa-non-trimmata)))
@@ -160,3 +172,8 @@
 
 ;;; Fine funzione leggi-oggetto 
 
+#|
+(if (= (length array) 1)
+      (cons (togli-virgolette (first array)) NIL)
+      (cons (togli-virgolette (first array)) (scansiona-array (rest array))))
+ |#
