@@ -10,6 +10,9 @@
         (T
           (concatenate 'string (primo-carattere stringa) (rimuovi-carattere carattere (subseq stringa 1))))))
 
+
+; inizio rimozione virgolette
+
 (defun togli-virgolette (input)
   (if (listp input)
       (cond ((equal (first input) 'jsonarray) 
@@ -32,6 +35,20 @@
         (T
           (cons (cons (togli-virgolette (car (first oggetto))) (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) (scansiona-oggetto (rest oggetto))))))
 
+; inizio rimozione virgolette
+
+
+; inizio ricerca sulle coppie
+
+(defun scansiona-coppie (oggetto chiave)
+  (if (null oggetto)
+      NIL
+      (if (equal (car (first oggetto)) chiave)
+          (car (cdr (first oggetto)))
+          (scansiona-coppie (rest oggetto) chiave))))
+
+; fine ricerca sulle coppie
+
 ;;; fine funzioni di supporto
 
 
@@ -53,7 +70,24 @@
 
 ;;; funzione jsonaccess
 
-
+(defun jsonaccess (struttura &rest lista)
+  (cond ((null lista) struttura)
+        ((listp struttura)
+            (cond
+                ((numberp (first lista))
+                  (if (equal (first struttura) 'jsonarray)
+                      (if (< (first lista) (- (length struttura) 1))
+                          (jsonaccess (nth (first lista) (rest struttura)) (rest lista))
+                          (error "[jsonaccess] invalid input (index out of bounds)"))
+                      (error "[jsonaccess] invalid parameter (array not found)")))
+                ((stringp (first lista))
+                  (if (equal (first struttura) 'jsonobj)
+                      (let ((valore (scansiona-coppie (rest struttura) (first lista))))
+                        (if (not (null valore))
+                            (jsonaccess valore (rest lista))
+                            (error "[jsonaccess] invalid input (key not found)")))
+                      (error "[jsonaccess] invalid parameter (object not found)")))))
+        (T struttura)))
 
 ;;; fine funzione jsonaccess
 
