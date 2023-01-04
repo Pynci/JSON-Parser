@@ -70,24 +70,26 @@
 
 ;;; funzione jsonaccess
 
+;;; da continuare (non l'ho ancora testata, palese non funziona)
 (defun jsonaccess (struttura &rest lista)
-  (cond ((null lista) struttura)
-        ((listp struttura)
-            (cond
-                ((numberp (first lista))
-                  (if (equal (first struttura) 'jsonarray)
-                      (if (< (first lista) (- (length struttura) 1))
-                          (jsonaccess (nth (first lista) (rest struttura)) (rest lista))
-                          (error "[jsonaccess] invalid input (index out of bounds)"))
-                      (error "[jsonaccess] invalid parameter (array not found)")))
-                ((stringp (first lista))
-                  (if (equal (first struttura) 'jsonobj)
-                      (let ((valore (scansiona-coppie (rest struttura) (first lista))))
-                        (if (not (null valore))
-                            (jsonaccess valore (rest lista))
-                            (error "[jsonaccess] invalid input (key not found)")))
-                      (error "[jsonaccess] invalid parameter (object not found)")))))
-        (T struttura)))
+  (cond ((null lista) struttura)    
+        ((numberp (first lista))
+          (if (listp struttura)
+              (if (equal (first struttura) 'jsonarray)
+                  (if (< (first lista) (- (length struttura) 1))
+                      (jsonaccess (nth (first lista) (rest struttura)) (rest lista))
+                      (error "[jsonaccess] invalid input (index out of bounds)"))
+                  (error "[jsonaccess] invalid parameter (array not found)"))
+              (error "[jsonaccess] invalid input")))
+        ((stringp (first lista))
+          (if (listp struttura)
+              (if (equal (first struttura) 'jsonobj)
+                  (let ((valore (scansiona-coppie (rest struttura) (first lista))))
+                    (if (not (null valore))
+                        (jsonaccess valore (rest lista))
+                        (error "[jsonaccess] invalid input (key not found)")))
+                  (error "[jsonaccess] invalid parameter (object not found)"))
+              (error "[jsonaccess] invalid input")))))
 
 ;;; fine funzione jsonaccess
 
