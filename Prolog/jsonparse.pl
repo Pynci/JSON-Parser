@@ -146,7 +146,6 @@ jsonaccess(jsonobj([','(_Chiave, _Valore) | AltreCoppie]), [Stringa, Numero], Ri
     !,
     jsonaccess(jsonbj(AltreCoppie), [Stringa, Numero], Risultato).
 
-
 jsonaccess(jsonobj([','(Stringa, jsonarray(Lista)) | _]), 
             [Stringa, Numero | AltriCampi], Risultato) :-
     number(Numero),
@@ -160,11 +159,26 @@ jsonaccess(jsonobj(','(_Chiave, _Valore) | AltreCoppie),
     !,
     jsonaccess(jsonobj(AltreCoppie), [Stringa, Numero | AltriCampi], Risultato).
 
-
 jsonaccess(jsonobj(X), Stringa, Risultato) :-
     string(Stringa),
     jsonaccess(jsonobj(X), [Stringa], Risultato),
     !.
+
+jsonaccess(jsonarray(X), Indice, Risultato) :-
+    number(Indice),
+    !,
+    nth0(Indice, X, Risultato).
+
+jsonaccess(jsonarray(X), [Indice], Risultato) :-
+    number(Indice),
+    !,
+    nth0(Indice, X, Risultato).
+
+jsonaccess(jsonarray(X), [Indice | Altro], Risultato) :-
+    number(Indice),
+    !,
+    nth0(Indice, X, Accesso),
+    jsonaccess(Accesso, Altro, Risultato).
 
 %%%% ---- fine ACCESSO JSON ----
 
