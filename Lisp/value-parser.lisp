@@ -96,9 +96,14 @@
 ;;; Funzione parser-stringa
 
 (defun leggi-stringa (stringa)
-  (if (equal (primo-carattere stringa) "\"")
-      "\""
-    (concatenate 'string (primo-carattere stringa) (leggi-stringa (subseq stringa 1)))))
+  (cond ((equal stringa "")
+          (error "[jsonparse] syntax error (missing \")"))
+        ((equal (primo-carattere stringa) "\"")
+          "\"")
+        ((equal (primo-carattere stringa) "\\")
+          (concatenate 'string (subseq stringa 0 2) (leggi-stringa (subseq stringa 2))))
+        (T
+          (concatenate 'string (primo-carattere stringa) (leggi-stringa (subseq stringa 1))))))
 
 ;;; Fine funzione leggi-stringa
 
