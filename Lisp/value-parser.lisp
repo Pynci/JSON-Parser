@@ -142,6 +142,24 @@
 
 
 
+;;; inizio lettura da file
+
+(defun leggi-da-file (file contenuto)
+  (let ((riga-letta (read-line file NIL)))
+    (if (not (null riga-letta))
+        (leggi-da-file file (concatenate 'string contenuto riga-letta))
+        contenuto)))
+
+(defun jsonread (nome-file)
+  (with-open-file (stream nome-file
+                          :direction :input
+                          :if-does-not-exist :error)
+    (jsonparse(leggi-da-file stream ""))))
+
+;;; fine lettura da file
+
+
+
 ;;; Funzione parser-value
 
 ; sdp = stringa da parsare
