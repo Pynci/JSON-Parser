@@ -29,7 +29,7 @@ is_quadra_chiusa(']').
 is_virgola(',').
 is_aperta_graffa('{').
 is_chiusa_graffa('}').
-is_double_point(':').
+is_due_punti(':').
 
 
 
@@ -493,7 +493,7 @@ leggi_coppie(Sequenza, [','(Chiave, ValoreLetto) | CoppieLette], Resto) :-
     parser_string(Sequenza, Chiave, Altro),
     trim_testa(Altro, AltroSenzaSpazi),
     nth0(0, AltroSenzaSpazi, DuePunti, Valore),
-    is_double_point(DuePunti),
+    is_due_punti(DuePunti),
     parser_value(Valore, ValoreLetto, VirgolaAltraCoppia),
     nth0(0, VirgolaAltraCoppia, Virgola, SpazioAltraCoppia),
     is_virgola(Virgola),
@@ -505,7 +505,7 @@ leggi_coppie(Sequenza, [','(Chiave, ValoreLetto)], Resto) :-
     parser_string(Sequenza, Chiave, Altro),
     trim_testa(Altro, AltroSenzaSpazi),
     nth0(0, AltroSenzaSpazi, DuePunti, Valore),
-    is_double_point(DuePunti),
+    is_due_punti(DuePunti),
     parser_value(Valore, ValoreLetto, GraffaChiusaResto),
     nth0(0, GraffaChiusaResto, Graffa, Resto),
     is_chiusa_graffa(Graffa).
