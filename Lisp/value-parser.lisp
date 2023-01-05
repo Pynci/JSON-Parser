@@ -136,7 +136,7 @@
                           :direction :output
                           :if-exists :supersede
                           :if-does-not-exist :create)
-    (format stream "~S" (inverti JSON))))
+    (write-string (inverti JSON) stream)))
 
 ;;; fine stampa su file
 
