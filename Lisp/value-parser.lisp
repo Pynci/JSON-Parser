@@ -38,8 +38,6 @@
 ; inizio rimozione virgolette
 
 
-; inizio ricerca sulle coppie
-
 (defun scansiona-coppie (oggetto chiave)
   (if (null oggetto)
       NIL
@@ -47,7 +45,11 @@
           (car (cdr (first oggetto)))
           (scansiona-coppie (rest oggetto) chiave))))
 
-; fine ricerca sulle coppie
+(defun appiattisci (input)
+  (cond ((null input) input)
+        ((atom input) (list input))
+        (T (append (appiattisci (first input)) (appiattisci (rest input))))))
+
 
 ;;; fine funzioni di supporto
 
@@ -71,8 +73,9 @@
 ;;; funzione jsonaccess
 
 ;;; da continuare (non l'ho ancora testata, palese non funziona)
-(defun jsonaccess (struttura &rest lista)
-  (cond ((null lista) struttura)    
+(defun jsonaccess (struttura &rest lista-non-flat)
+  (let ((lista (appiattisci lista-non-flat)))
+    (cond ((null (first lista)) struttura)    
         ((numberp (first lista))
           (if (listp struttura)
               (if (equal (first struttura) 'jsonarray)
@@ -89,7 +92,7 @@
                         (jsonaccess valore (rest lista))
                         (error "[jsonaccess] invalid input (key not found)")))
                   (error "[jsonaccess] invalid parameter (object not found)"))
-              (error "[jsonaccess] invalid input")))))
+              (error "[jsonaccess] invalid input"))))))
 
 ;;; fine funzione jsonaccess
 
