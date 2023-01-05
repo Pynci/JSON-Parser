@@ -11,7 +11,7 @@
           (concatenate 'string (primo-carattere stringa) (rimuovi-carattere carattere (subseq stringa 1))))))
 
 
-; inizio rimozione virgolette
+; inizio gestione virgolette
 
 (defun togli-virgolette (input)
   (if (listp input)
@@ -35,7 +35,13 @@
         (T
           (cons (cons (togli-virgolette (car (first oggetto))) (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) (scansiona-oggetto (rest oggetto))))))
 
-; inizio rimozione virgolette
+(defun aggiungi-backslash (stringa)
+  (cond ((equal stringa "") "")
+        ((equal (primo-carattere stringa) "\"")
+          (concatenate 'string "\\\"" (aggiungi-backslash (subseq stringa 1))))
+        (T (concatenate 'string (primo-carattere stringa) (aggiungi-backslash (subseq stringa 1))))))
+
+; inizio gestione virgolette
 
 
 (defun scansiona-coppie (oggetto chiave)
@@ -52,6 +58,7 @@
 
 
 ;;; fine funzioni di supporto
+
 
 
 ;;; funzione jsonparse
@@ -95,6 +102,43 @@
               (error "[jsonaccess] invalid input"))))))
 
 ;;; fine funzione jsonaccess
+
+
+
+;;; stampa su file
+
+(defun inverti (valore)
+    (cond ((equal valore 'true) "true")
+          ((equal valore 'false) "false")
+          ((equal valore 'null) "null")
+          ((numberp valore) (write-to-string valore))
+          ((stringp valore) (concatenate 'string "\"" (aggiungi-backslash valore) "\""))
+          ((listp valore)
+            (if (equal (first valore) 'jsonarray)
+                (concatenate 'string "[" (inverti-array (rest valore)) "]")
+                (concatenate 'string "{" (inverti-oggetto (rest valore)) "}")))))
+
+(defun inverti-array (array)
+  (cond ((null array) "")
+        ((null (rest array)) (inverti (first array)))
+        (T (concatenate 'string (inverti (first array)) ", " (inverti-array (rest array))))))
+
+(defun inverti-oggetto (oggetto)
+  (cond ((null oggetto) "")
+        ((null (rest oggetto)) (inverti-coppia (first oggetto)))
+        (T (concatenate 'string (inverti-coppia (first oggetto)) ", " (inverti-oggetto (rest oggetto))))))
+
+(defun inverti-coppia (coppia)
+  (concatenate 'string (inverti (car coppia)) " : " (inverti (car (cdr coppia)))))
+
+(defun jsondump (JSON nome-file)
+  (with-open-file (stream nome-file
+                          :direction :output
+                          :if-exists :supersede
+                          :if-does-not-exist :create)
+    (format stream "~S" (inverti JSON))))
+
+;;; fine stampa su file
 
 
 
