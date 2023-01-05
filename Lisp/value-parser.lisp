@@ -144,8 +144,8 @@
 
 ;;; inizio lettura da file
 
-(defun leggi-da-file (file contenuto)
-  (let ((riga-letta (read-line file NIL)))
+(defun leggi-da-file (file contenuto)   ; contenuto è un accumulatore
+  (let ((riga-letta (read-line file NIL)))  ; NIL serve a dirgli di non generare errori quando arriva a fine file
     (if (not (null riga-letta))
         (leggi-da-file file (concatenate 'string contenuto riga-letta))
         contenuto)))
