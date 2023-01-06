@@ -64,49 +64,42 @@ parser_value(Stringa, Valore, Resto) :-
     trim(Stringa, StringaSenzaSpazi),
     parser_string(StringaSenzaSpazi, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    %writeln("TROVATA STRINGA"),
     !.
 
 parser_value(Numero, Valore, Resto) :-
     trim(Numero, NumeroTrimmato),
     parser_q(NumeroTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    %writeln("TROVATO NUMERO"),
     !.
 
 parser_value(Oggetto, Valore, Resto) :-
     trim(Oggetto, OggettoTrimmato),
     parser_object(OggettoTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    %writeln("TROVATO OGGETTO"),
     !.
 
 parser_value(Array, Valore, Resto) :-
     trim(Array, ArrayTrimmato),
     parser_array(ArrayTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    %writeln("TROVATO ARRAY"),
     !.
 
 parser_value(True, Valore, Resto) :-
     trim(True, TrueTrimmato),
     parser_true(TrueTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    %writeln("TROVATO TRUE"),
     !.
 
 parser_value(False, Valore, Resto) :-
     trim(False, FalseTrimmato),
     parser_false(FalseTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    %writeln("TROVATO FALSE"),
     !.
 
 parser_value(Null, Valore, Resto) :-
     trim(Null, NullTrimmato),
     parser_null(NullTrimmato, Valore, RestoConSpazi),
     trim(RestoConSpazi, Resto),
-    %writeln("TROVATO NULL"),
     !.
 
 %%%% ---- fine PARSING JSON ----
@@ -119,12 +112,16 @@ parser_value(Null, Valore, Resto) :-
 % consulta la struttura composta creata da jsonparse/2 e risponde true se
 % è in grado di trovare il dato specificato da Risultato percorrendo la
 % struttura secondo quanto indicato dalla lista dei campi (passata come
-% secondo argomento)
+% secondo argomento).
 
+
+% casi base
 jsonaccess(jsonobj(X), [], jsonobj(X)) :- !.
 
 jsonaccess(jsonarray(X), [], jsonarray(X)) :- !.
 
+
+% accesso nella struttura jsonarray
 jsonaccess(jsonarray(X), Indice, Risultato) :-
     number(Indice),
     !,
@@ -141,6 +138,8 @@ jsonaccess(jsonarray(X), [Indice | Altro], Risultato) :-
     nth0(Indice, X, Accesso),
     jsonaccess(Accesso, Altro, Risultato).
 
+
+% accesso nella struttura jsonobj
 jsonaccess(jsonobj([','(Stringa, Risultato) | _]), [Stringa], Risultato) :- !.
 
 jsonaccess(jsonobj([','(_Chiave, _Valore) | AltreCoppie]), [Stringa], Risultato) :-
@@ -189,8 +188,9 @@ jsonaccess(jsonobj(X), Stringa, Risultato) :-
 %%%% ---- inizio STAMPA JSON SU FILE ----
 
 %%% inverti/2
-% è un predicato di supporto che serve ricavare i dati dagli oggetti JSON per
-% comporre una stringa scritta in standard JSON (pronta da stampare su file)
+% è un predicato di supporto che serve ricavare i dati dagli oggetti JSON (creati da
+% jsonparse/2) per comporre una stringa scritta in standard JSON
+% (pronta da stampare su file)
 
 inverti(Stringa, StringaFinale) :-
     string(Stringa),
@@ -318,31 +318,11 @@ jsondump(JSON, FileName) :-
 % è un predicato che consente di leggere quanto stampato da jsondump/2 su file.
 
 jsonread(FileName, JSON) :-
-    %open(FileName, read, In),
-    %read(In, AtomLetto),
-    %close(In),
     read_file_to_string(FileName, Stringa, []),
     atom_string(Atomo, Stringa),
     atom_chars(Atomo, Lista),
-    arricchisci_stringa_slash(Lista, ListaArricchita),
-    atomic_list_concat(ListaArricchita, AtomoJSON),
+    atomic_list_concat(Lista, AtomoJSON),
     jsonparse(AtomoJSON, JSON).
-
-
-%%% arricchisci_stringa_slash/2
-% è un predicato di supporto che consente a jsonread/2 di distinguere le
-% virgolette interne alla stringa da quelle che la delimitano, così che
-% possa gestirle in maniera coerente.
-
-arricchisci_stringa_slash([], []).
-
-arricchisci_stringa_slash([Carattere1 | AltriCaratteri], [Carattere1 | Altro]) :-
-    is_backslash(Carattere1),
-    !,
-    arricchisci_stringa_slash(AltriCaratteri, Altro).
-
-arricchisci_stringa_slash([Carattere1 | AltriCaratteri], [Carattere1 | Risultato]) :-
-    arricchisci_stringa_slash(AltriCaratteri, Risultato).
 
 %%%% ---- fine LETTURA JSON DA FILE ----
 
@@ -352,7 +332,7 @@ arricchisci_stringa_slash([Carattere1 | AltriCaratteri], [Carattere1 | Risultato
 
 %%% parser_string/3
 % è un predicato che consente di riconoscere una stringa a partire da una
-% sequenza di caratteri
+% sequenza di caratteri.
 
 parser_string([Virgolette | AltriCaratteri], Stringa, Resto) :-
     is_virgolette(Virgolette),
@@ -391,23 +371,27 @@ leggi_stringa([Carattere | Altro], [Carattere | LettiPrecedentemente], Resto) :-
 % L'implementazione è tratta da quella presentata all'interno delle slide
 % del corso.
 
-parser_n(Chars, I , MoreChars) :-
-    parser_n(Chars, [], I, _, MoreChars).
+% ListaCifre è una lista di atomi (le cifre del numero parsato),
+% number_string funziona perché accetta in ingresso una lista di 
+% atomi e la tratta come se fosse una stringa.
 
-parser_n([D | Ds], DsSoFar, I, ICs, Rest) :-
-    is_digit(D),
-    !,
-    parser_n(Ds, [D | DsSoFar], I, ICs, Rest).
+parser_n(Caratteri, NumeroOttenuto , CaratteriRestanti) :-
+    parser_n(Caratteri, [], NumeroOttenuto, _, CaratteriRestanti).
 
-parser_n([C | Cs], DsR, I, Digits, [C | Cs]) :-
+parser_n([Cifra | Cifre], CifreAccumulate, NumeroOttenuto, ListaCifre, CaratteriRestanti) :-
+    is_digit(Cifra),
     !,
-    reverse(DsR, Digits),
-    number_string(I, Digits).
+    parser_n(Cifre, [Cifra | CifreAccumulate], NumeroOttenuto, ListaCifre, CaratteriRestanti).
 
-parser_n([], DsR, I, Digits, []) :-
+parser_n([Carattere | CaratteriRestanti], CifreLette, NumeroOttenuto, ListaCifre, [Carattere | CaratteriRestanti]) :-
     !,
-    reverse(DsR, Digits),
-    number_string(I, Digits).
+    reverse(CifreLette, ListaCifre),
+    number_string(NumeroOttenuto, ListaCifre).
+
+parser_n([], CifreLette, NumeroOttenuto, ListaCifre, []) :-
+    !,
+    reverse(CifreLette, ListaCifre),
+    number_string(NumeroOttenuto, ListaCifre).
 
 
 %%% parser_z/3
@@ -428,7 +412,6 @@ parser_z([Cifra | CifreRimanenti], CifreLette, NumeroOttenuto, CifreDelNumero, C
     parser_z(CifreRimanenti, [Cifra | CifreLette], NumeroOttenuto, CifreDelNumero, CaratteriRestanti).
 
 parser_z([Carattere | CaratteriRestanti], CifreLette, NumeroOttenuto, CifreDelNumero, [Carattere | CaratteriRestanti]) :-
-    %is_non_digit(Carattere),
     !,
     reverse(CifreLette, CifreDelNumero),
     number_string(NumeroOttenuto, CifreDelNumero).
@@ -479,9 +462,9 @@ parser_esponenziale([Carattere | Altro], 1, [Carattere | Altro]).
 
 %%% parser_object/3
 % è un predicato che consente di riconoscere la struttura complessa di un
-% object in JSON a partire da una sequenza di caratteri.
+% oggetto in JSON a partire da una sequenza di caratteri.
 % Il predicato inoltre costruisce una struttura prolog composta che permette di
-% immagazzinare al suo interno i dati che caratterizzano l'object riconosciuto.
+% immagazzinare al suo interno i dati che caratterizzano l'oggetto riconosciuto
 
 parser_object([Graffa | Sequenza], jsonobj(), Resto) :-
     is_aperta_graffa(Graffa),
@@ -496,8 +479,8 @@ parser_object([Graffa | Sequenza], jsonobj(Coppie), Resto) :-
 
 %%% leggi_coppie/3
 % è un predicato di supporto che consente a parser_object/3 di individuare
-% tutte le coppie chiave:valore che fanno parte dell'object JSON.
-% Individua inoltre la parentesi graffa che decreta la fine dell'object JSON.
+% tutte le coppie 'chiave:valore' che fanno parte dell'oggetto JSON.
+% Individua inoltre la parentesi graffa che decreta la fine dell'oggetto JSON.
 
 leggi_coppie(Sequenza, [','(Chiave, ValoreLetto) | CoppieLette], Resto) :-
     parser_string(Sequenza, Chiave, Altro),
