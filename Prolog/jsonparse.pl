@@ -391,20 +391,20 @@ leggi_stringa([Carattere | Altro], [Carattere | LettiPrecedentemente], Resto) :-
 % L'implementazione è tratta da quella presentata all'interno delle slide
 % del corso.
 
-parse_n(Chars, I , MoreChars) :-
-    parse_n(Chars, [], I, _, MoreChars).
+parser_n(Chars, I , MoreChars) :-
+    parser_n(Chars, [], I, _, MoreChars).
 
-parse_n([D | Ds], DsSoFar, I, ICs, Rest) :-
+parser_n([D | Ds], DsSoFar, I, ICs, Rest) :-
     is_digit(D),
     !,
-    parse_n(Ds, [D | DsSoFar], I, ICs, Rest).
+    parser_n(Ds, [D | DsSoFar], I, ICs, Rest).
 
-parse_n([C | Cs], DsR, I, Digits, [C | Cs]) :-
+parser_n([C | Cs], DsR, I, Digits, [C | Cs]) :-
     !,
     reverse(DsR, Digits),
     number_string(I, Digits).
 
-parse_n([], DsR, I, Digits, []) :-
+parser_n([], DsR, I, Digits, []) :-
     !,
     reverse(DsR, Digits),
     number_string(I, Digits).
@@ -446,20 +446,30 @@ parser_z([], CifreLette, NumeroOttenuto, CifreDelNumero, []) :-
 parser_q(Sequenza, NumeroOttenuto, CaratteriRimanenti) :-
     parser_q(Sequenza, [], NumeroOttenuto, _SequenzaLetta, CaratteriRimanenti).
 
-parser_q(Sequenza, [], NumeroOttenuto, SequenzaLetta, Resto) :-
+parser_q(Sequenza, [], ValoreOttenuto, SequenzaLetta, Resto) :-
     parser_z(Sequenza, [], _Intero, ListaIntero, CaratteriRimanenti),
-    parser_decimale(CaratteriRimanenti, ListaDecimali, Resto),
+    parser_decimale(CaratteriRimanenti, ListaDecimali, EventualeEsponente),
     append(ListaIntero, ListaDecimali, SequenzaLetta),
-    number_string(NumeroOttenuto, SequenzaLetta).
+    number_string(NumeroOttenuto, SequenzaLetta),
+    parser_esponenziale(EventualeEsponente, Esponente, Resto),
+    ValoreOttenuto is NumeroOttenuto * Esponente.
 
 parser_decimale([Punto | Altro], ['.' | ListaDecimali], Resto) :-
     is_punto(Punto),
     !,
-    parse_n(Altro, [], _Decimale, ListaDecimali, Resto).
+    parser_n(Altro, [], _Decimale, ListaDecimali, Resto).
 
 parser_decimale([Carattere | Altro], [], [Carattere | Altro]).
 
 parser_decimale([], [], []).
+
+parser_esponenziale([E | CifreEsponente], Valore, Resto) :-
+    is_e(E),
+    !,
+    parser_z(CifreEsponente, Esponente, Resto),
+    Valore is 10 ** Esponente.
+
+parser_esponenziale([Carattere | Altro], 1, [Carattere | Altro]).
 
 %%%% ---- fine PARSING NUMERI ----
 
