@@ -1,6 +1,6 @@
 %%%% -*- Mode: Prolog -*-
 
-%% Progetto JSON-Parser realizzato da
+%% Progetto JSON PARSING realizzato da
 %% Luca Pinciroli 885969
 %% Marco Ferioli 879277
 
@@ -325,6 +325,10 @@ jsonread(FileName, JSON) :-
     jsonparse(AtomoJSON, JSON).
 
 %%%% ---- fine LETTURA JSON DA FILE ----
+
+
+
+% -----------------------------------------------------------------------------
 
 
 
