@@ -156,53 +156,13 @@
 	  ((numberp (digit-char-p (char sdp 0))) 
 	   (let ((numlet (leggi-numero sdp)))
 	     (let ((resto (subseq sdp (length numlet))))
-	       (if (equal (primo-carattere resto) "e")
-		   (if (equal (subseq resto 1 2) "-")
-		       (let ((esponente (leggi-numero (subseq resto 2))))
-			 (if (not (null (find #\. numlet)))
-			     (cons (* (parse-float numlet)
-				      (expt 10 (parse-integer (concatenate 'string "-" esponente))))
-				   (subseq resto (+ 2 (length esponente))))
-			   (cons (* (parse-integer numlet)
-				    (expt 10 (parse-integer (concatenate 'string "-" esponente))))
-				 (subseq resto (+ 2 (length esponente))))))
-		     (let ((esponente (leggi-numero (subseq resto 1))))
-		       (if (not (null (find #\. numlet)))
-			   (cons (* (parse-float numlet)
-				    (expt 10 (parse-integer esponente)))
-				 (subseq resto (+ 1 (length esponente))))
-			 (cons (* (parse-integer numlet)
-				  (expt 10 (parse-integer esponente)))
-			       (subseq resto (+ 1 (length esponente)))))))
-		 (if (not (null (find #\. numlet)))
-		     (cons (parse-float numlet) resto)
-		   (cons (parse-integer numlet) resto))))))
+	       (parser-numero numlet resto))))
 
 	  ;; parsing numero negativo
 	  ((equal (primo-carattere sdp) "-")
 	   (let ((numlet (concatenate 'string "-" (leggi-numero (subseq sdp 1)))))
 	     (let ((resto (subseq sdp (length numlet))))
-	       (if (equal (primo-carattere resto) "e")
-		   (if (equal (subseq resto 1 2) "-")
-		       (let ((esponente (leggi-numero (subseq resto 2))))
-			 (if (not (null (find #\. numlet)))
-			     (cons (* (parse-float numlet)
-				      (expt 10 (parse-integer (concatenate 'string "-" esponente))))
-				   (subseq resto (+ 2 (length esponente))))
-			   (cons (* (parse-integer numlet)
-				    (expt 10 (parse-integer (concatenate 'string "-" esponente))))
-				 (subseq resto (+ 2 (length esponente))))))
-		     (let ((esponente (leggi-numero (subseq resto 1))))
-		       (if (not (null (find #\. numlet)))
-			   (cons (* (parse-float numlet)
-				    (expt 10 (parse-integer esponente)))
-				 (subseq resto (+ 1 (length esponente))))
-			 (cons (* (parse-integer numlet)
-				  (expt 10 (parse-integer esponente)))
-			       (subseq resto (+ 1 (length esponente)))))))
-		 (if (not (null (find #\. numlet)))
-		     (cons (parse-float numlet) resto)
-		   (cons (parse-integer numlet) resto))))))
+	       (parser-numero numlet resto))))
 	  
 	  ;; parsing true, false e null
 	  ((> (length sdp) 3)
@@ -359,8 +319,38 @@
 
 ;;; --- inizio PARSING NUMERI ---
 
+;;; Funzione parser-numero
+;; è una funzione di supporto a parser-value che si occupa di effettuare
+;; il parsing corretto tenendo conto di ciascun caso in cui può presentarsi
+;; un numero: intero, virgola mobile, negativo, con esponente o senza ecc.
+;; Viene impiegata per costruire correttamente l'output da far ritornare a
+;; parser-value.
+
+(defun parser-numero (numlet resto)
+	(if (equal (primo-carattere resto) "e")
+		   (if (equal (subseq resto 1 2) "-")
+		       (let ((esponente (leggi-numero (subseq resto 2))))
+			 (if (not (null (find #\. numlet)))
+			     (cons (* (parse-float numlet)
+				      (expt 10 (parse-integer (concatenate 'string "-" esponente))))
+				   (subseq resto (+ 2 (length esponente))))
+			   (cons (* (parse-integer numlet)
+				    (expt 10 (parse-integer (concatenate 'string "-" esponente))))
+				 (subseq resto (+ 2 (length esponente))))))
+		     (let ((esponente (leggi-numero (subseq resto 1))))
+		       (if (not (null (find #\. numlet)))
+			   (cons (* (parse-float numlet)
+				    (expt 10 (parse-integer esponente)))
+				 (subseq resto (+ 1 (length esponente))))
+			 (cons (* (parse-integer numlet)
+				  (expt 10 (parse-integer esponente)))
+			       (subseq resto (+ 1 (length esponente)))))))
+		 (if (not (null (find #\. numlet)))
+		     (cons (parse-float numlet) resto)
+		   (cons (parse-integer numlet) resto))))
+
 ;;; Funzione leggi-numero
-;; è una funzione di supporto a parser-value che consente di individuare
+;; è una funzione di supporto a parser-numero che consente di individuare
 ;; le cifre facenti parte di un numero JSON.
 ;; pe = primo elemento
 
