@@ -29,7 +29,7 @@
 	 (concatenate 'string "" (rimuovi-carattere carattere (subseq stringa 1))))
         (T
 	 (concatenate 'string (primo-carattere stringa)
-	 (rimuovi-carattere carattere (subseq stringa 1))))))
+		      (rimuovi-carattere carattere (subseq stringa 1))))))
 
 ;; -- inizio gestione virgolette --
 
@@ -58,11 +58,11 @@
   (cond ((= (length oggetto) 0) NIL)
         ((= (length oggetto) 1)
 	 (cons (cons (togli-virgolette (car (first oggetto)))
-	 (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) NIL))
+		     (cons (togli-virgolette (car (cdr (first oggetto)))) NIL)) NIL))
         (T
 	 (cons (cons (togli-virgolette (car (first oggetto)))
-	 (cons (togli-virgolette (car (cdr (first oggetto)))) NIL))
-	 (scansiona-oggetto (rest oggetto))))))
+		     (cons (togli-virgolette (car (cdr (first oggetto)))) NIL))
+	       (scansiona-oggetto (rest oggetto))))))
 
 ;;; Funzione aggiungi-backslash
 ;; è una funzione di supporto che permette la corretta distinzione tra le
@@ -76,7 +76,7 @@
 	 (concatenate 'string "\\\"" (aggiungi-backslash (subseq stringa 1))))
         (T
 	 (concatenate 'string (primo-carattere stringa)
-	 (aggiungi-backslash (subseq stringa 1))))))
+		      (aggiungi-backslash (subseq stringa 1))))))
 
 ;; -- fine gestione virgolette --
 
@@ -161,19 +161,19 @@
 		       (let ((esponente (leggi-numero (subseq resto 2))))
 			 (if (not (null (find #\. numlet)))
 			     (cons (* (parse-float numlet)
-				 (expt 10 (parse-integer (concatenate 'string "-" esponente))))
-				 (subseq resto (+ 2 (length esponente))))
+				      (expt 10 (parse-integer (concatenate 'string "-" esponente))))
+				   (subseq resto (+ 2 (length esponente))))
 			   (cons (* (parse-integer numlet)
-			   (expt 10 (parse-integer (concatenate 'string "-" esponente))))
-			   (subseq resto (+ 2 (length esponente))))))
+				    (expt 10 (parse-integer (concatenate 'string "-" esponente))))
+				 (subseq resto (+ 2 (length esponente))))))
 		     (let ((esponente (leggi-numero (subseq resto 1))))
 		       (if (not (null (find #\. numlet)))
 			   (cons (* (parse-float numlet)
-			   (expt 10 (parse-integer esponente)))
-			   (subseq resto (+ 1 (length esponente))))
+				    (expt 10 (parse-integer esponente)))
+				 (subseq resto (+ 1 (length esponente))))
 			 (cons (* (parse-integer numlet)
-			 (expt 10 (parse-integer esponente)))
-			 (subseq resto (+ 1 (length esponente)))))))
+				  (expt 10 (parse-integer esponente)))
+			       (subseq resto (+ 1 (length esponente)))))))
 		 (if (not (null (find #\. numlet)))
 		     (cons (parse-float numlet) resto)
 		   (cons (parse-integer numlet) resto))))))
@@ -187,19 +187,19 @@
 		       (let ((esponente (leggi-numero (subseq resto 2))))
 			 (if (not (null (find #\. numlet)))
 			     (cons (* (parse-float numlet)
-				 (expt 10 (parse-integer (concatenate 'string "-" esponente))))
-				 (subseq resto (+ 2 (length esponente))))
+				      (expt 10 (parse-integer (concatenate 'string "-" esponente))))
+				   (subseq resto (+ 2 (length esponente))))
 			   (cons (* (parse-integer numlet)
-			   (expt 10 (parse-integer (concatenate 'string "-" esponente))))
-			   (subseq resto (+ 2 (length esponente))))))
+				    (expt 10 (parse-integer (concatenate 'string "-" esponente))))
+				 (subseq resto (+ 2 (length esponente))))))
 		     (let ((esponente (leggi-numero (subseq resto 1))))
 		       (if (not (null (find #\. numlet)))
 			   (cons (* (parse-float numlet)
-			   (expt 10 (parse-integer esponente)))
-			   (subseq resto (+ 1 (length esponente))))
+				    (expt 10 (parse-integer esponente)))
+				 (subseq resto (+ 1 (length esponente))))
 			 (cons (* (parse-integer numlet)
-			 (expt 10 (parse-integer esponente)))
-			 (subseq resto (+ 1 (length esponente)))))))
+				  (expt 10 (parse-integer esponente)))
+			       (subseq resto (+ 1 (length esponente)))))))
 		 (if (not (null (find #\. numlet)))
 		     (cons (parse-float numlet) resto)
 		   (cons (parse-integer numlet) resto))))))
@@ -291,19 +291,19 @@
   (cond ((null array) "")
         ((null (rest array)) (inverti (first array)))
         (T
-		 (concatenate 'string (inverti (first array)) ", "
-		 (inverti-array (rest array))))))
+	 (concatenate 'string (inverti (first array)) ", "
+		      (inverti-array (rest array))))))
 
 (defun inverti-oggetto (oggetto)
   (cond ((null oggetto) "")
         ((null (rest oggetto)) (inverti-coppia (first oggetto)))
         (T
-		 (concatenate 'string (inverti-coppia (first oggetto)) ", "
-		 (inverti-oggetto (rest oggetto))))))
+	 (concatenate 'string (inverti-coppia (first oggetto)) ", "
+		      (inverti-oggetto (rest oggetto))))))
 
 (defun inverti-coppia (coppia)
   (concatenate 'string (inverti (car coppia)) " : "
-  (inverti (car (cdr coppia)))))
+	       (inverti (car (cdr coppia)))))
 
 ;;; --- inizio STAMPA JSON SU FILE ---
 
@@ -351,7 +351,7 @@
 	 (concatenate 'string (subseq stringa 0 2) (leggi-stringa (subseq stringa 2))))
         (T
 	 (concatenate 'string (primo-carattere stringa)
-	 (leggi-stringa (subseq stringa 1))))))
+		      (leggi-stringa (subseq stringa 1))))))
 
 ;;; --- fine PARSING STRINGHE ---
 
@@ -409,14 +409,14 @@
   (let ((stringa (string-trim-whitespace stringa-ricevuta)))
     (if (equal (primo-carattere stringa) "\"")
 	(let  ((chiave
-	 (concatenate 'string "\""
-	 (leggi-stringa (subseq stringa 1)))))
+		(concatenate 'string "\""
+			     (leggi-stringa (subseq stringa 1)))))
 	  (let ((resto
-	   (string-trim-whitespace (subseq stringa (length chiave)
-	   (length stringa)))))
+		 (string-trim-whitespace (subseq stringa (length chiave)
+						 (length stringa)))))
 	    (if (equal (primo-carattere resto) ":")
 		(let ((valore
-		 (parser-value (string-trim-whitespace (subseq resto 1)))))
+		       (parser-value (string-trim-whitespace (subseq resto 1)))))
 		  (if (listp (car valore))
 		      (cons (cons chiave (cons (car valore) NIL)) (car (cdr valore)))
 		    (cons (cons chiave (cons (car valore) NIL)) (cdr valore))))
@@ -444,9 +444,9 @@
 	  (let ((elementi-restanti (parser-value (subseq stringa 1))))
 	    (if (listp (car elementi-restanti))
 		(cons (car elementi-restanti)
-		(leggi-array (car (cdr elementi-restanti))))
+		      (leggi-array (car (cdr elementi-restanti))))
 	      (cons (car elementi-restanti)
-		  (leggi-array (cdr elementi-restanti))))))
+		    (leggi-array (cdr elementi-restanti))))))
 	 (T
 	  (let ((primo-valore (parser-value stringa)))
 	    (if (listp (car primo-valore))
