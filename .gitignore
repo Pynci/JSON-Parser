@@ -4,3 +4,4 @@ LogoProgetto.png
 # esclusione file di LispWorks
 Lisp/*.64ofasl
 Lisp/*.64yfasl
+Lisp/*.64ofasl
