@@ -147,7 +147,8 @@ jsonaccess(jsonobj([','(Stringa, Risultato) | _]),
 jsonaccess(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
 	   [Stringa],
 	   Risultato) :-
-    jsonaccess(jsonobj(AltreCoppie), [Stringa], Risultato).
+    jsonaccess(jsonobj(AltreCoppie), [Stringa], Risultato),
+    !.
 
 jsonaccess(jsonobj([','(Stringa, jsonobj(AltreCoppie)) | _]),
 	   [Stringa | AltreStringhe],
@@ -520,7 +521,7 @@ parser_esponenziale([Carattere | Altro], 1, [Carattere | Altro]).
 % Il predicato inoltre costruisce una struttura prolog composta che permette di
 % immagazzinare al suo interno i dati che caratterizzano l'oggetto riconosciuto
 
-parser_object([Graffa | Sequenza], jsonobj(), Resto) :-
+parser_object([Graffa | Sequenza], jsonobj([]), Resto) :-
     is_aperta_graffa(Graffa),
     trim_testa(Sequenza, GraffaAltro),
     nth0(0, GraffaAltro, ChiusaGraffa, Resto),
