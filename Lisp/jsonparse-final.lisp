@@ -190,9 +190,11 @@
 ;; indicato dagli eventuali argomenti passati (il primo argomento è la
 ;; struttura, dal secondo argomento in poi bisogna specificare la lista di
 ;; campi  JSON da consultare), per poi restituire il dato individuato.
+;; strttura-nc = struttura non controllata
 
-(defun jsonaccess (struttura &rest lista-non-flat)
-  (let ((lista (appiattisci lista-non-flat)))
+(defun jsonaccess (struttura-nc &rest lista-non-flat)
+  (let ((struttura (jsonparse (inverti struttura-nc))))
+	(let ((lista (appiattisci lista-non-flat)))
     (cond ((null (first lista)) struttura)    
 	  ((numberp (first lista))
 	   (if (listp struttura)
@@ -210,7 +212,7 @@
 			 (jsonaccess valore (rest lista))
 		       (error "[jsonaccess] invalid input (key not found)")))
 		 (error "[jsonaccess] invalid parameter (object not found)"))
-	     (error "[jsonaccess] invalid input"))))))
+	     (error "[jsonaccess] invalid input")))))))
 
 ;;; --- fine ACCESSO JSON ---
 
