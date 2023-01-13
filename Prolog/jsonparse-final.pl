@@ -114,88 +114,96 @@ parser_value(Null, Valore, Resto) :-
 % struttura secondo quanto indicato dalla lista dei campi (passata come
 % secondo argomento).
 
+jsonaccess(Struttura, Lista, X) :-
+    inverti(Struttura, _JSON),
+    access_value(Struttura, Lista, X).
+
+
+%%% access_value/3
+% riceve l'input da consultare ed effettua l'effettiva ricerca tramite i campi,
+% con la garanzia di avere in ingresso una struttura corretta.
 
 % casi base
-jsonaccess(jsonobj(X), [], jsonobj(X)) :- !.
+access_value(jsonobj(X), [], jsonobj(X)) :- !.
 
-jsonaccess(jsonarray(X), [], jsonarray(X)) :- !.
+access_value(jsonarray(X), [], jsonarray(X)) :- !.
 
 
 % accesso nella struttura jsonarray
-jsonaccess(jsonarray(X), Indice, Risultato) :-
+access_value(jsonarray(X), Indice, Risultato) :-
     number(Indice),
     !,
     nth0(Indice, X, Risultato).
 
-jsonaccess(jsonarray(X), [Indice], Risultato) :-
+access_value(jsonarray(X), [Indice], Risultato) :-
     number(Indice),
     !,
     nth0(Indice, X, Risultato).
 
-jsonaccess(jsonarray(X), [Indice | Altro], Risultato) :-
+access_value(jsonarray(X), [Indice | Altro], Risultato) :-
     number(Indice),
     !,
     nth0(Indice, X, Accesso),
-    jsonaccess(Accesso, Altro, Risultato).
+    access_value(Accesso, Altro, Risultato).
 
 
 % accesso nella struttura jsonobj
-jsonaccess(jsonobj([','(Stringa, Risultato) | _]),
+access_value(jsonobj([','(Stringa, Risultato) | _]),
 	   [Stringa],
 	   Risultato) :- !.
 
-jsonaccess(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
+access_value(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
 	   [Stringa],
 	   Risultato) :-
-    jsonaccess(jsonobj(AltreCoppie), [Stringa], Risultato),
+    access_value(jsonobj(AltreCoppie), [Stringa], Risultato),
     !.
 
-jsonaccess(jsonobj([','(Stringa, jsonobj(AltreCoppie)) | _]),
+access_value(jsonobj([','(Stringa, jsonobj(AltreCoppie)) | _]),
 	   [Stringa | AltreStringhe],
 	   Risultato) :-
-    jsonaccess(jsonobj(AltreCoppie), AltreStringhe, Risultato),
+    access_value(jsonobj(AltreCoppie), AltreStringhe, Risultato),
     !.
 
-jsonaccess(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
+access_value(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
 	   [Stringa | AltreStringhe],
 	   Risultato) :-
-    jsonaccess(jsonobj(AltreCoppie), [Stringa | AltreStringhe], Risultato),
+    access_value(jsonobj(AltreCoppie), [Stringa | AltreStringhe], Risultato),
     !.
 
-jsonaccess(jsonobj([','(Stringa, jsonarray(Lista)) | _]),
+access_value(jsonobj([','(Stringa, jsonarray(Lista)) | _]),
 	   [Stringa, Numero],
 	   Risultato) :-
     number(Numero),
     !,
     nth0(Numero, Lista, Risultato, _).
 
-jsonaccess(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
+access_value(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
 	   [Stringa, Numero],
 	   Risultato) :-
     number(Numero),
     !,
-    jsonaccess(jsonbj(AltreCoppie), [Stringa, Numero], Risultato).
+    access_value(jsonbj(AltreCoppie), [Stringa, Numero], Risultato).
 
-jsonaccess(jsonobj([','(Stringa, jsonarray(Lista)) | _]), 
+access_value(jsonobj([','(Stringa, jsonarray(Lista)) | _]), 
            [Stringa, Numero | AltriCampi],
 	   Risultato) :-
     number(Numero),
     !,
     nth0(Numero, Lista, jsonobj(Altro)),
-    jsonaccess(jsonobj(Altro), AltriCampi, Risultato).
+    access_value(jsonobj(Altro), AltriCampi, Risultato).
 
-jsonaccess(jsonobj(','(_Chiave, _Valore) | AltreCoppie),
+access_value(jsonobj(','(_Chiave, _Valore) | AltreCoppie),
            [Stringa, Numero | AltriCampi],
 	   Risultato) :-
     number(Numero),
     !,
-    jsonaccess(jsonobj(AltreCoppie),
+    access_value(jsonobj(AltreCoppie),
 	       [Stringa, Numero | AltriCampi],
 	       Risultato).
 
-jsonaccess(jsonobj(X), Stringa, Risultato) :-
+access_value(jsonobj(X), Stringa, Risultato) :-
     string(Stringa),
-    jsonaccess(jsonobj(X), [Stringa], Risultato),
+    access_value(jsonobj(X), [Stringa], Risultato),
     !.
 
 %%%% ---- fine ACCESSO JSON ----
