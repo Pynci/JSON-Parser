@@ -149,57 +149,57 @@ access_value(jsonarray(X), [Indice | Altro], Risultato) :-
 
 % accesso nella struttura jsonobj
 access_value(jsonobj([','(Stringa, Risultato) | _]),
-	   [Stringa],
-	   Risultato) :- !.
+	     [Stringa],
+	     Risultato) :- !.
 
 access_value(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
-	   [Stringa],
-	   Risultato) :-
+	     [Stringa],
+	     Risultato) :-
     access_value(jsonobj(AltreCoppie), [Stringa], Risultato),
     !.
 
 access_value(jsonobj([','(Stringa, jsonobj(AltreCoppie)) | _]),
-	   [Stringa | AltreStringhe],
-	   Risultato) :-
+	     [Stringa | AltreStringhe],
+	     Risultato) :-
     access_value(jsonobj(AltreCoppie), AltreStringhe, Risultato),
     !.
 
 access_value(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
-	   [Stringa | AltreStringhe],
-	   Risultato) :-
+	     [Stringa | AltreStringhe],
+	     Risultato) :-
     access_value(jsonobj(AltreCoppie), [Stringa | AltreStringhe], Risultato),
     !.
 
 access_value(jsonobj([','(Stringa, jsonarray(Lista)) | _]),
-	   [Stringa, Numero],
-	   Risultato) :-
+	     [Stringa, Numero],
+	     Risultato) :-
     number(Numero),
     !,
     nth0(Numero, Lista, Risultato, _).
 
 access_value(jsonobj([','(_Chiave, _Valore) | AltreCoppie]),
-	   [Stringa, Numero],
-	   Risultato) :-
+	     [Stringa, Numero],
+	     Risultato) :-
     number(Numero),
     !,
     access_value(jsonbj(AltreCoppie), [Stringa, Numero], Risultato).
 
 access_value(jsonobj([','(Stringa, jsonarray(Lista)) | _]), 
-           [Stringa, Numero | AltriCampi],
-	   Risultato) :-
+             [Stringa, Numero | AltriCampi],
+	     Risultato) :-
     number(Numero),
     !,
     nth0(Numero, Lista, jsonobj(Altro)),
     access_value(jsonobj(Altro), AltriCampi, Risultato).
 
 access_value(jsonobj(','(_Chiave, _Valore) | AltreCoppie),
-           [Stringa, Numero | AltriCampi],
-	   Risultato) :-
+             [Stringa, Numero | AltriCampi],
+	     Risultato) :-
     number(Numero),
     !,
     access_value(jsonobj(AltreCoppie),
-	       [Stringa, Numero | AltriCampi],
-	       Risultato).
+		 [Stringa, Numero | AltriCampi],
+		 Risultato).
 
 access_value(jsonobj(X), Stringa, Risultato) :-
     string(Stringa),
@@ -638,7 +638,7 @@ parser_true([Carattere1, Carattere2, Carattere3, Carattere4 | Resto],
 % sequenza di caratteri.
 
 parser_false([Carattere1, Carattere2, Carattere3, Carattere4, Carattere5
-            | Resto], False, Resto) :-
+              | Resto], False, Resto) :-
     is_f(Carattere1),
     is_a(Carattere2),
     is_l(Carattere3),
