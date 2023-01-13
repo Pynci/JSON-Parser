@@ -507,7 +507,9 @@ parser_esponenziale([E | CifreEsponente], Valore, Resto) :-
     parser_z(CifreEsponente, Esponente, Resto),
     Valore is 10 ** Esponente.
 
-parser_esponenziale([Carattere | Altro], 1, [Carattere | Altro]).
+parser_esponenziale([Carattere | Altro], 1, [Carattere | Altro]) :- !.
+
+parser_esponenziale([], 1, []).
 
 %%%% ---- fine PARSING NUMERI ----
 
